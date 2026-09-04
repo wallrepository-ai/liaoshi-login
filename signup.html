@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create account: sources-liaoshi</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
+         justify-content: center; padding-top: 8vh; margin: 0; }
+  .card { background: #fff; padding: 32px; border-radius: 10px; width: 340px;
+          box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+  label { display: block; margin-bottom: 4px; }
+  input { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc;
+          border-radius: 6px; box-sizing: border-box; }
+  button { width: 100%; padding: 10px; background: #7a1f1f; color: #fff; border: none;
+           border-radius: 6px; font-size: 15px; cursor: pointer; }
+  .err { color: #b00020; margin: 0 0 12px; }
+  .ok { color: #1a6b1a; margin: 0 0 12px; }
+  .note { margin: 16px 0 0; font-size: 13px; color: #777; }
+  .muted { margin: 0 0 18px; color: #555; }
+</style>
+</head>
+<body>
+<form class="card" method="POST"
+      action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/signup">
+  <h2 style="margin:0 0 6px">Create your researcher account</h2>
+  <p class="muted">遼史 sources-liaoshi. Registration is free and open to all researchers.</p>
+  <p class="err" id="err" hidden></p>
+  <p class="ok" id="ok" hidden></p>
+  <label>Email</label>
+  <input name="email" type="email" required autocomplete="username">
+  <label>Choose a password (10+ characters)</label>
+  <input name="password" type="password" required minlength="10" autocomplete="new-password">
+  <label>Repeat password</label>
+  <input name="password2" type="password" required minlength="10" autocomplete="new-password">
+  <button type="submit">Create account</button>
+  <p class="note">You will receive a verification email. After confirming, return to your
+  AI client and connect again with your email and password.</p>
+</form>
+<script>
+  var p = new URLSearchParams(location.search);
+  if (p.get('notice') === 'check_email') {
+    var ok = document.getElementById('ok');
+    ok.textContent = 'Account requested. Check your inbox and click the verification link, ' +
+                     'then return to your AI client, connect again, and sign in.';
+    ok.hidden = false;
+  }
+  if (p.get('error')) {
+    var el = document.getElementById('err');
+    el.textContent = decodeURIComponent(p.get('error'));
+    el.hidden = false;
+  }
+</script>
+</body>
+</html>

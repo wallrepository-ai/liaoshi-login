@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in: sources-liaoshi</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
+         justify-content: center; padding-top: 8vh; margin: 0; }
+  .card { background: #fff; padding: 32px; border-radius: 10px; width: 320px;
+          box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+  label { display: block; margin-bottom: 4px; }
+  input { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc;
+          border-radius: 6px; box-sizing: border-box; }
+  button { width: 100%; padding: 10px; background: #7a1f1f; color: #fff; border: none;
+           border-radius: 6px; font-size: 15px; cursor: pointer; }
+  .err { color: #b00020; margin: 0 0 12px; }
+  .sub { margin: 16px 0 0; font-size: 14px; color: #555; }
+  .muted { margin: 0 0 18px; color: #555; }
+</style>
+</head>
+<body>
+<form class="card" method="POST"
+      action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/login">
+  <h2 style="margin:0 0 6px">遼史 sources-liaoshi</h2>
+  <p class="muted">Sign in to connect your AI client to the Liaoshi research database.</p>
+  <p class="err" id="err" hidden></p>
+  <input type="hidden" name="mcp_state" id="mcp_state">
+  <label>Email</label>
+  <input name="email" type="email" required autocomplete="username">
+  <label>Password</label>
+  <input name="password" type="password" required autocomplete="current-password">
+  <button type="submit">Sign in</button>
+  <p class="sub">New researcher? <a id="signup_link" href="signup.html" style="color:#7a1f1f">Create an account</a></p>
+</form>
+<script>
+  var p = new URLSearchParams(location.search);
+  document.getElementById('mcp_state').value = p.get('state') || '';
+  var link = document.getElementById('signup_link');
+  link.href = 'signup.html' + (p.get('state') ? ('?state=' + encodeURIComponent(p.get('state'))) : '');
+  var errs = {
+    invalid: 'Invalid credentials. Please try again.',
+    expired: 'Your login session expired. Close this window and reconnect from your AI client.',
+    unverified: 'Please verify your email first (check your inbox), then sign in again.'
+  };
+  if (p.get('error')) {
+    var el = document.getElementById('err');
+    el.textContent = errs[p.get('error')] || 'Sign-in failed. Please try again.';
+    el.hidden = false;
+  }
+</script>
+</body>
+</html>
