@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sources-liaoshi — menu</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; margin: 0;
+         color: #222; }
+  header { background: #7a1f1f; color: #fff; padding: 20px 24px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 6px 0 0; opacity: .85; font-size: 14px; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
+  .cat { margin: 26px 0 8px; color: #7a1f1f; font-size: 13px; letter-spacing: .08em;
+         text-transform: uppercase; }
+  .bit { background: #fff; border-radius: 10px; padding: 18px 20px; margin: 12px 0;
+         box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  .bit h2 { margin: 0 0 8px; font-size: 17px; }
+  .bit p { margin: 0; line-height: 1.55; color: #333; }
+  .bit a.link { color: #7a1f1f; }
+  .note { color: #666; font-size: 13px; margin-top: 30px; }
+  code { background: #efe9dd; padding: 1px 5px; border-radius: 4px; }
+  .err { color: #b00020; }
+</style>
+</head>
+<body>
+<header>
+  <h1>遼史 sources-liaoshi</h1>
+  <p>A scholarly database of the Liaoshi, queried from your AI chat client. This menu is also available inside any chat: just type <strong>menu</strong>.</p>
+</header>
+<main id="main"><p id="loading">Loading…</p></main>
+<script>
+  var API = 'https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/bits';
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+  function mdInline(s){ // minimal: **bold** and 遼史*italic* left as text; escape first
+    return esc(s).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  }
+  fetch(API).then(function(r){return r.json();}).then(function(d){
+    var main = document.getElementById('main');
+    main.innerHTML = '';
+    var bits = (d.bits||[]);
+    var lastCat = null;
+    bits.forEach(function(b){
+      if (b.category !== lastCat) {
+        var h = document.createElement('div'); h.className='cat';
+        h.textContent = b.category; main.appendChild(h); lastCat = b.category;
+      }
+      var card = document.createElement('div'); card.className='bit';
+      var t = document.createElement('h2'); t.textContent = b.title; card.appendChild(t);
+      var p = document.createElement('p'); p.innerHTML = mdInline(b.body_md); card.appendChild(p);
+      if (b.url) { var a=document.createElement('a'); a.className='link'; a.href=b.url;
+        a.textContent='Open link'; card.appendChild(document.createElement('br'));
+        card.appendChild(a); }
+      main.appendChild(card);
+    });
+    var note = document.createElement('p'); note.className='note';
+    note.innerHTML = 'Inside a chat client, type <code>menu</code> for this list, or '
+      + '<code>menu about</code> / <code>menu sources</code> for one item. '
+      + 'To sign in and query, use the connector.';
+    main.appendChild(note);
+  }).catch(function(e){
+    document.getElementById('main').innerHTML =
+      '<p class="err">Could not load the menu. Please try again later.</p>';
+  });
+</script>
+</body>
+</html>
