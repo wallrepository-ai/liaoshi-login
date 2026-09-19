@@ -3,7 +3,7 @@
 ## What this repository is
 
 The public GitHub Pages host for the Liaoshi connector's sign-in pages. It holds
-four static HTML files and nothing else. No build step, no dependencies, no secrets.
+five static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
 
 Served at: https://wallrepository-ai.github.io/liaoshi-login/
 
@@ -13,6 +13,7 @@ Served at: https://wallrepository-ai.github.io/liaoshi-login/
 | `signup.html` | Account creation |
 | `verified.html` | Post-verification landing page |
 | `menu.html` | Public "data bits" info menu |
+| `connect.html` | Connection guide: sign-in steps and the per-tool permission cards Claude shows |
 
 ## The main project is elsewhere
 

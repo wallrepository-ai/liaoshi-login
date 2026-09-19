@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to connect: sources-liaoshi</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; margin: 0;
+         color: #222; }
+  header { background: #7a1f1f; color: #fff; padding: 20px 24px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 6px 0 0; opacity: .85; font-size: 14px; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
+  .cat { margin: 26px 0 8px; color: #7a1f1f; font-size: 13px; letter-spacing: .08em;
+         text-transform: uppercase; }
+  .bit { background: #fff; border-radius: 10px; padding: 18px 20px; margin: 12px 0;
+         box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  .bit h2 { margin: 0 0 8px; font-size: 17px; }
+  .bit p { line-height: 1.55; color: #333; }
+  .bit p { margin: 0 0 10px; }
+  .bit p:last-child { margin-bottom: 0; }
+  a { color: #7a1f1f; }
+  code { background: #efe9dd; padding: 1px 5px; border-radius: 4px; word-break: break-all; }
+  table { border-collapse: collapse; width: 100%; margin: 4px 0 12px; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #eee;
+           vertical-align: top; }
+  th { color: #7a1f1f; font-weight: 600; }
+  .ro { color: #1a6b1a; white-space: nowrap; }
+  .wr { color: #b00020; white-space: nowrap; }
+  .note { color: #666; font-size: 13px; margin-top: 30px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>遼史 sources-liaoshi</h1>
+  <p>Connecting from Claude or another AI client: sign in once, approve the tools once.</p>
+</header>
+<main>
+
+  <div class="cat">1 · Add the connector</div>
+  <div class="bit">
+    <h2>Add sources-liaoshi as a custom connector</h2>
+    <p>In Claude open <strong>Customize → Connectors → Add custom connector</strong>,
+    give it a name (for example <em>sources-liaoshi</em>) and paste this URL:</p>
+    <p><code>https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server</code></p>
+    <p>Other MCP-capable clients (Claude Desktop, ChatGPT, and others) take the same URL.
+    A free Claude account can hold one custom connector.</p>
+  </div>
+
+  <div class="cat">2 · Sign in</div>
+  <div class="bit">
+    <h2>Sign in when Claude says the connector "needs setup"</h2>
+    <p>Click <strong>Connect</strong> on the connector card, sign in with your email and
+    password, and you are sent back to the chat. No account yet?
+    <a href="signup.html">Create one</a>, click the verification link in your inbox,
+    then connect again.</p>
+    <p>Your sign-in renews itself for 30 days. After that Claude asks you to sign in
+    once more.</p>
+  </div>
+
+  <div class="cat">3 · The permission cards</div>
+  <div class="bit">
+    <h2>"Claude wants to use Query from sources-liaoshi"</h2>
+    <p>Claude asks before it uses any tool of a custom connector for the first time.
+    This is Claude's own safety step, not a sign-in problem, and the database cannot
+    switch it off. You will see one card per tool:</p>
+    <table>
+      <tr><th>Tool</th><th>What it does</th><th>Changes anything?</th></tr>
+      <tr><td>List tables</td><td>lists the tables of the database</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Describe table</td><td>explains the columns of one table</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Query</td><td>runs one SELECT, at most 200 rows</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Menu</td><td>About, how to use, sources, news, contact</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Get scan</td><td>15-minute link to a scanned printed page</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Submit comment</td><td>records a comment or correction under your name</td><td class="wr">yes, writes</td></tr>
+    </table>
+    <p>Choose <strong>Always allow</strong> on the read-only tools and that card does not
+    come back. <strong>Allow once</strong> means you are asked again next time. For
+    <em>Submit comment</em> you may prefer to approve each time, so nothing is recorded in
+    your name without you seeing it.</p>
+  </div>
+  <div class="bit">
+    <h2>Set all tools at once</h2>
+    <p>Open <strong>Customize → Connectors</strong>, choose the connector and look for
+    <strong>Tools</strong> or <strong>Tool permissions</strong>. There each tool, or the
+    read-only group, can be set to <em>Always allow</em>; some plans also offer
+    <em>Skip approvals</em> for the whole connector. Only do this for connectors you
+    trust, which for a read-only research database is a reasonable choice.</p>
+  </div>
+  <div class="bit">
+    <h2>Asked again after a while?</h2>
+    <p>When the database server is updated, Claude forgets earlier approvals and asks
+    once more. Choose <em>Always allow</em> again; nothing else is needed.</p>
+  </div>
+
+  <div class="cat">Trouble?</div>
+  <div class="bit">
+    <h2>Common messages</h2>
+      <p><strong>"Its setup isn't finished"</strong>: sign in through the connector
+      card, then repeat your question.</p>
+      <p><strong>"Your login session expired"</strong>: close the sign-in window and
+      reconnect from the chat client; the sign-in page is valid for 10 minutes.</p>
+      <p><strong>"Please verify your email first"</strong>: click the link in the
+      verification email, then sign in again.</p>
+      <p><strong>"Rate limit reached"</strong>: 60 calls per hour per account; wait a
+      little and continue.</p>
+  </div>
+
+  <p class="note">Inside a chat, type <code>menu</code> for the info menu, or read it on
+  the <a href="menu.html">menu page</a>. <a href="index.html">Back to sign-in</a>.</p>
+</main>
+</body>
+</html>
