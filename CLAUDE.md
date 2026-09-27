@@ -52,8 +52,11 @@ Consequences for anyone editing these files:
   Check `oauth.ts` in `sources` before renaming anything in a form.
 - Validation rules here must match what the edge function accepts. A stricter rule
   in the HTML silently rejects input the server would have allowed.
-- Pushing to `main` deploys to the live site immediately. Treat a merge to `main`
-  as a deployment and confirm with the owner first.
+- Pushing to `main` deploys to the live site immediately. Finished work merges at
+  once without owner review (owner, 2026-09-27), with one gate: a change to a form
+  field name, a form action or a validation rule merges only together with the
+  matching change in `oauth.ts` in `sources`, because the two must agree or login
+  breaks. Tell the owner in the next report what changed on the live site.
 
 ## Working norms
 
