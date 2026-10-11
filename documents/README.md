@@ -1,6 +1,6 @@
 # Documents
 
-Public documentation for the sources-liaoshi database. Each file is served at
+Public documentation for the AID (AI and Database) database. Each file is served at
 https://wallrepository-ai.github.io/liaoshi-login/documents/FILENAME and can be
 requested in a chat client by typing `menu documents`.
 

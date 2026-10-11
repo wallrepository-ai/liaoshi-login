@@ -2,7 +2,7 @@
 
 ## What this repository is
 
-The public GitHub Pages host for the Liaoshi connector's sign-in pages. It holds
+The public GitHub Pages host for the AID (AI and Database) connector's sign-in pages. It holds
 five static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
 
 Served at: https://wallrepository-ai.github.io/liaoshi-login/

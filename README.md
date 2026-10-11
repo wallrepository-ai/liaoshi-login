@@ -1,6 +1,6 @@
-# liaoshi-login
+# liaoshi-login (AID sign-in pages)
 
-Static sign-in pages for the 遼史 sources-liaoshi MCP connector, hosted on GitHub
+Static sign-in pages for the AID (AI and Database) MCP connector, hosted on GitHub
 Pages at https://wallrepository-ai.github.io/liaoshi-login/. The connector itself is
 the Supabase edge function `mcp-server` in the private repository
 `wallrepository-ai/sources`; it redirects browsers to these pages for the authorize,
