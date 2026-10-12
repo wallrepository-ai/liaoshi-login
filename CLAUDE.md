@@ -45,6 +45,16 @@ The Supabase edge function at `sources/supabase/functions/mcp-server/oauth.ts` r
 a `LOGIN_PAGES_URL` secret and issues 302 redirects to the pages here for the
 authorize, signup, and welcome steps. The forms post back to the edge function.
 OAuth state travels as a query parameter plus a hidden form field, with a cookie fallback.
+`index.html` passes the state on to `signup.html` (`?state=`), which returns it in a hidden
+`mcp_state` field, so the server can send a researcher who already has an account back to
+sign in without a new connection attempt. The sign-in page knows four error codes in its
+query string (`invalid`, `expired`, `unverified`, `exists`) and prefills the email field
+from `?email=`; the sign-up page shows `?notice=check_email` or `?error=<text>`.
+
+Testing a change to these pages: `python3 refinement/scripts/login_e2e.py pages` in
+`sources` renders every page state with screenshots, and `start` plus `finish` run the
+whole procedure (account, email, verification, OAuth sign-in, MCP call, cleanup). The
+procedure and its record: `sources/docs/LOGIN_TEST_PROCEDURE.md`.
 
 Consequences for anyone editing these files:
 
