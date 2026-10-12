@@ -16,7 +16,19 @@
            border-radius: 6px; font-size: 15px; cursor: pointer; }
   .err { color: #b00020; margin: 0 0 12px; }
   .ok { color: #1a6b1a; margin: 0 0 12px; }
+  .pw { position: relative; }
+  .pw input { padding-right: 40px; }
+  .eye { position: absolute; right: 4px; top: 3px; width: 30px; height: 30px; padding: 0;
+         margin: 0; background: none; border: none; border-radius: 6px; color: #777;
+         cursor: pointer; font-size: 0; line-height: 0; }
+  .eye:hover { color: #7a1f1f; }
+  .eye svg { width: 20px; height: 20px; }
+  .eye .slash { display: none; }
+  .eye.on .slash { display: inline; }
   .note { margin: 16px 0 0; font-size: 13px; color: #777; }
+  .choice { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0 18px;
+            font-size: 14px; color: #555; }
+  .choice input { width: auto; margin: 3px 0 0; }
   .muted { margin: 0 0 18px; color: #555; }
 </style>
 </head>
@@ -31,9 +43,12 @@
   <label>Email</label>
   <input name="email" type="email" required autocomplete="username">
   <label>Choose a password (at least 6 characters)</label>
-  <input name="password" type="password" required minlength="6" autocomplete="new-password">
+  <div class="pw"><input name="password" type="password" required minlength="6" autocomplete="new-password"><button type="button" class="eye" aria-label="Show password" title="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button></div>
   <label>Repeat password</label>
-  <input name="password2" type="password" required minlength="6" autocomplete="new-password">
+  <div class="pw"><input name="password2" type="password" required minlength="6" autocomplete="new-password"><button type="button" class="eye" aria-label="Show password" title="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button></div>
+  <label class="choice"><input type="checkbox" name="feedback" id="feedback" value="yes" checked>
+  <span>I would like feedback from AID: replies about comments I submit and news about the
+  database. I can withdraw at any time. <a href="privacy.html" style="color:#7a1f1f">Privacy note</a></span></label>
   <button type="submit">Create account</button>
   <p class="note">You will receive a verification email. After confirming, return to your
   AI client and connect again with your email and password.</p>
@@ -54,6 +69,17 @@
     el.textContent = decodeURIComponent(p.get('error'));
     el.hidden = false;
   }
+  // The eye on a password field shows or hides what was typed.
+  Array.prototype.forEach.call(document.querySelectorAll('.eye'), function (b) {
+    b.addEventListener('click', function () {
+      var i = b.parentNode.querySelector('input');
+      var show = i.type === 'password';
+      i.type = show ? 'text' : 'password';
+      b.classList.toggle('on', show);
+      b.title = show ? 'Hide password' : 'Show password';
+      b.setAttribute('aria-label', b.title);
+    });
+  });
 </script>
 </body>
 </html>

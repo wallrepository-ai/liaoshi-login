@@ -15,6 +15,16 @@
   button { width: 100%; padding: 10px; background: #7a1f1f; color: #fff; border: none;
            border-radius: 6px; font-size: 15px; cursor: pointer; }
   .err { color: #b00020; margin: 0 0 12px; }
+  .ok { color: #1a6b1a; margin: 0 0 12px; }
+  .pw { position: relative; }
+  .pw input { padding-right: 40px; }
+  .eye { position: absolute; right: 4px; top: 3px; width: 30px; height: 30px; padding: 0;
+         margin: 0; background: none; border: none; border-radius: 6px; color: #777;
+         cursor: pointer; font-size: 0; line-height: 0; }
+  .eye:hover { color: #7a1f1f; }
+  .eye svg { width: 20px; height: 20px; }
+  .eye .slash { display: none; }
+  .eye.on .slash { display: inline; }
   .sub { margin: 16px 0 0; font-size: 14px; color: #555; }
   .muted { margin: 0 0 18px; color: #555; }
 </style>
@@ -25,14 +35,17 @@
   <h2 style="margin:0 0 6px">AID</h2>
   <p class="muted">Sign in to connect your AI client to the AID research database.</p>
   <p class="err" id="err" hidden></p>
+  <p class="ok" id="ok" hidden></p>
   <input type="hidden" name="mcp_state" id="mcp_state">
   <label>Email</label>
   <input name="email" type="email" id="email" required autocomplete="username">
   <label>Password</label>
-  <input name="password" type="password" required autocomplete="current-password">
+  <div class="pw"><input name="password" type="password" required autocomplete="current-password"><button type="button" class="eye" aria-label="Show password" title="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button></div>
   <button type="submit">Sign in</button>
   <p class="sub">New researcher? <a id="signup_link" href="signup.html" style="color:#7a1f1f">Create an account</a></p>
-  <p class="sub" style="margin-top:8px"><a href="connect.html" style="color:#7a1f1f">Trouble connecting? Read the connection guide</a></p>
+  <p class="sub" style="margin-top:8px">Forgot your password? <a id="reset_link" href="reset.html" style="color:#7a1f1f">Reset it</a></p>
+  <p class="sub" style="margin-top:8px"><a href="connect.html" style="color:#7a1f1f">Trouble connecting? Read the connection guide</a>
+  · <a href="privacy.html" style="color:#7a1f1f">Privacy note</a></p>
 </form>
 <script>
   var p = new URLSearchParams(location.search);
@@ -45,6 +58,9 @@
     unverified: 'Please verify your email first (check your inbox), then sign in again.',
     exists: 'An account with this email already exists and is verified. Sign in with your password.'
   };
+  var notices = {
+    password_changed: 'Your password is changed. Return to your AI client, connect again, and sign in with the new password.'
+  };
   if (p.get('email')) {
     document.getElementById('email').value = p.get('email');
   }
@@ -53,6 +69,27 @@
     el.textContent = errs[p.get('error')] || 'Sign-in failed. Please try again.';
     el.hidden = false;
   }
+  if (p.get('notice') && notices[p.get('notice')]) {
+    var ok = document.getElementById('ok');
+    ok.textContent = notices[p.get('notice')];
+    ok.hidden = false;
+  }
+  // The reset link takes along whatever email is typed, so it need not be typed twice.
+  document.getElementById('reset_link').addEventListener('click', function (e) {
+    var v = document.getElementById('email').value.trim();
+    if (v) { e.preventDefault(); location.href = 'reset.html?email=' + encodeURIComponent(v); }
+  });
+  // The eye on a password field shows or hides what was typed.
+  Array.prototype.forEach.call(document.querySelectorAll('.eye'), function (b) {
+    b.addEventListener('click', function () {
+      var i = b.parentNode.querySelector('input');
+      var show = i.type === 'password';
+      i.type = show ? 'text' : 'password';
+      b.classList.toggle('on', show);
+      b.title = show ? 'Hide password' : 'Show password';
+      b.setAttribute('aria-label', b.title);
+    });
+  });
 </script>
 </body>
 </html>

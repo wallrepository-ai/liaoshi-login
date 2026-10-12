@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy note: AID</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; margin: 0; padding: 6vh 16px; }
+  main { background: #fff; padding: 32px; border-radius: 10px; max-width: 640px; margin: 0 auto;
+         box-shadow: 0 2px 12px rgba(0,0,0,.1); color: #333; line-height: 1.5; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  h2 { margin: 22px 0 6px; font-size: 16px; }
+  p { margin: 0 0 10px; }
+  .draft { color: #7a1f1f; font-size: 14px; margin: 0 0 16px; }
+  a { color: #7a1f1f; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Privacy note</h1>
+  <p class="draft">Draft of 2026-10-12, written for the owner's review. It describes what the
+  system does today; the owner will confirm or amend it.</p>
+
+  <h2>What AID keeps about you</h2>
+  <p>An account is an email address and a password. The password is stored only as a
+  hash by Supabase Auth, the sign-in service the database runs on; nobody can read it
+  back. The address is used to verify the account, to let you sign in from your AI
+  client, and to send you a reset link if you ask for one.</p>
+  <p>When your AI client queries the database, AID logs the request: the wording of
+  your question as the client sends it, the query it ran, the rows it returned, the
+  time, the client program and the address it came from, and the account that made it.
+  The owner reads this log to see what researchers ask and where the database falls
+  short, and to keep the service working. Comments you submit through the connector are
+  kept with the account that sent them.</p>
+
+  <h2>Feedback from AID</h2>
+  <p>The sign-up form has a box, ticked by default, asking whether you would like
+  feedback from AID: replies about comments you submit and news about the database. AID
+  writes to you only if the box is ticked, and records when you made the choice and
+  which version of this note you saw. You can withdraw at any time through the contact
+  entry of the <a href="menu.html">menu</a>; no message is sent after that.</p>
+
+  <h2>What AID does not do</h2>
+  <p>Your address and your questions are not sold, shared or passed on to anyone, and
+  are not used for advertising. The sign-in pages set one short-lived cookie during
+  sign-in and no other; there is no tracking on these pages. The services that hold the
+  data are Supabase (the database and sign-in), GitHub Pages (these pages) and the email
+  service that delivers verification and reset links.</p>
+
+  <h2>Deleting your account</h2>
+  <p>Ask through the contact entry of the <a href="menu.html">menu</a>. The account, its
+  profile and its sessions are deleted; comments you submitted stay with the database
+  under no name, because they are corrections to a shared text.</p>
+
+  <p style="margin-top:22px"><a href="index.html">Back to sign-in</a> ·
+  <a href="signup.html">Create an account</a> · <a href="connect.html">Connection guide</a></p>
+</main>
+</body>
+</html>
