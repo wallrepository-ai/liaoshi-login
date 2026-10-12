@@ -27,7 +27,7 @@
   <p class="err" id="err" hidden></p>
   <input type="hidden" name="mcp_state" id="mcp_state">
   <label>Email</label>
-  <input name="email" type="email" required autocomplete="username">
+  <input name="email" type="email" id="email" required autocomplete="username">
   <label>Password</label>
   <input name="password" type="password" required autocomplete="current-password">
   <button type="submit">Sign in</button>
@@ -42,8 +42,12 @@
   var errs = {
     invalid: 'Invalid credentials. Please try again.',
     expired: 'Your login session expired. Close this window and reconnect from your AI client.',
-    unverified: 'Please verify your email first (check your inbox), then sign in again.'
+    unverified: 'Please verify your email first (check your inbox), then sign in again.',
+    exists: 'An account with this email already exists and is verified. Sign in with your password.'
   };
+  if (p.get('email')) {
+    document.getElementById('email').value = p.get('email');
+  }
   if (p.get('error')) {
     var el = document.getElementById('err');
     el.textContent = errs[p.get('error')] || 'Sign-in failed. Please try again.';

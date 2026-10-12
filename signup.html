@@ -27,6 +27,7 @@
   <p class="muted">AID (AI and Database). Registration is free and open to all researchers.</p>
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
+  <input type="hidden" name="mcp_state" id="mcp_state">
   <label>Email</label>
   <input name="email" type="email" required autocomplete="username">
   <label>Choose a password (at least 6 characters)</label>
@@ -39,6 +40,9 @@
 </form>
 <script>
   var p = new URLSearchParams(location.search);
+  // The sign-in page passes its OAuth state here; the server returns it to the
+  // sign-in page when the address turns out to have an account already.
+  document.getElementById('mcp_state').value = p.get('state') || '';
   if (p.get('notice') === 'check_email') {
     var ok = document.getElementById('ok');
     ok.textContent = 'Account requested. Check your inbox and click the verification link, ' +
