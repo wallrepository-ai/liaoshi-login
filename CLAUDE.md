@@ -57,7 +57,8 @@ researchers typed a new address into the sign-in form and were refused); the `in
 message says the same. The sign-in page knows four error codes in its
 query string (`invalid`, `expired`, `unverified`, `exists`), one notice
 (`password_changed`), and prefills the email field from `?email=`; the sign-up page shows
-`?notice=check_email` or `?error=<text>` and posts the feedback box as `feedback=yes`, which
+`?notice=check_email` (the notice alone, under the title "Account requested", without the form,
+since 2026-10-13) or `?error=<text>` and posts the feedback box as `feedback=yes`, which
 the function records on the account's profile row. Password reset: `reset.html` posts the
 address to `/recover` and shows `?notice=sent` or `?error=<text>`; Supabase Auth's reset
 email links to `newpassword.html` with a one-hour token in the URL fragment (that address is

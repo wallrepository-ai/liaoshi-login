@@ -35,11 +35,12 @@
 <body>
 <form class="card" method="POST"
       action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/signup">
-  <h2 style="margin:0 0 6px">Create your researcher account</h2>
-  <p class="muted">AID (AI and Database). Registration is free and open to all researchers.</p>
+  <h2 style="margin:0 0 6px" id="title">Create your researcher account</h2>
+  <p class="muted" id="intro">AID (AI and Database). Registration is free and open to all researchers.</p>
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
   <input type="hidden" name="mcp_state" id="mcp_state">
+  <div id="fields">
   <label>Email</label>
   <input name="email" type="email" required autocomplete="username">
   <label>Choose a password (at least 6 characters)</label>
@@ -52,6 +53,8 @@
   <button type="submit">Create account</button>
   <p class="note">You will receive a verification email. After confirming, return to your
   AI client and connect again with your email and password.</p>
+  </div>
+  <p class="note" id="done" hidden>You can close this window.</p>
 </form>
 <script>
   var p = new URLSearchParams(location.search);
@@ -59,10 +62,16 @@
   // sign-in page when the address turns out to have an account already.
   document.getElementById('mcp_state').value = p.get('state') || '';
   if (p.get('notice') === 'check_email') {
+    // The account is requested: show the notice alone, not the empty form again,
+    // which read as a request to register once more (owner, 2026-10-13).
     var ok = document.getElementById('ok');
     ok.textContent = 'Account requested. Check your inbox and click the verification link, ' +
                      'then return to your AI client, connect again, and sign in.';
     ok.hidden = false;
+    document.getElementById('title').textContent = 'Account requested';
+    document.getElementById('intro').hidden = true;
+    document.getElementById('fields').hidden = true;
+    document.getElementById('done').hidden = false;
   }
   if (p.get('error')) {
     var el = document.getElementById('err');
