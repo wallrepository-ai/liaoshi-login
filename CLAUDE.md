@@ -9,7 +9,7 @@ Served at: https://wallrepository-ai.github.io/liaoshi-login/
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Sign-in page (OAuth authorize) |
+| `index.html` | Sign-in page (OAuth authorize); the "Create an account" button sits at the top, above the sign-in form |
 | `signup.html` | Account creation |
 | `verified.html` | Post-verification landing page |
 | `menu.html` | Public "data bits" info menu |
@@ -50,7 +50,11 @@ authorize, signup, and welcome steps. The forms post back to the edge function.
 OAuth state travels as a query parameter plus a hidden form field, with a cookie fallback.
 `index.html` passes the state on to `signup.html` (`?state=`), which returns it in a hidden
 `mcp_state` field, so the server can send a researcher who already has an account back to
-sign in without a new connection attempt. The sign-in page knows four error codes in its
+sign in without a new connection attempt. The sign-in card opens with a "New researcher?"
+block whose "Create an account" button is drawn like the sign-in button, then a rule and
+the sign-in form under "Already have an account?" (owner request 2026-10-13, after
+researchers typed a new address into the sign-in form and were refused); the `invalid`
+message says the same. The sign-in page knows four error codes in its
 query string (`invalid`, `expired`, `unverified`, `exists`), one notice
 (`password_changed`), and prefills the email field from `?email=`; the sign-up page shows
 `?notice=check_email` or `?error=<text>` and posts the feedback box as `feedback=yes`, which

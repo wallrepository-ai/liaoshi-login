@@ -14,6 +14,16 @@
           border-radius: 6px; box-sizing: border-box; }
   button { width: 100%; padding: 10px; background: #7a1f1f; color: #fff; border: none;
            border-radius: 6px; font-size: 15px; cursor: pointer; }
+  button[type=submit]:hover, .btn:hover { background: #641818; }
+  /* The "Create an account" link is drawn as a button so that a newcomer cannot miss it. */
+  .btn { display: block; box-sizing: border-box; width: 100%; padding: 10px; margin: 10px 0 8px;
+         background: #7a1f1f; color: #fff; border-radius: 6px; font-size: 15px;
+         text-align: center; text-decoration: none; }
+  .new { background: #f5f2ea; border-radius: 8px; padding: 14px 14px 12px; margin: 0; }
+  .lead { margin: 0; font-size: 15px; color: #333; }
+  .fine { margin: 0; font-size: 13px; color: #777; }
+  .sep { border: 0; border-top: 2px solid #d9d3c7; margin: 22px 0 14px; }
+  .existing { margin: 0 0 14px; }
   .err { color: #b00020; margin: 0 0 12px; }
   .ok { color: #1a6b1a; margin: 0 0 12px; }
   .pw { position: relative; }
@@ -21,7 +31,7 @@
   .eye { position: absolute; right: 4px; top: 3px; width: 30px; height: 30px; padding: 0;
          margin: 0; background: none; border: none; border-radius: 6px; color: #777;
          cursor: pointer; font-size: 0; line-height: 0; }
-  .eye:hover { color: #7a1f1f; }
+  .eye:hover { color: #7a1f1f; background: none; }
   .eye svg { width: 20px; height: 20px; }
   .eye .slash { display: none; }
   .eye.on .slash { display: inline; }
@@ -33,7 +43,17 @@
 <form class="card" method="POST"
       action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/login">
   <h2 style="margin:0 0 6px">AID</h2>
-  <p class="muted">Sign in to connect your AI client to the AID research database.</p>
+  <p class="muted">Connect your AI client to the AID research database.</p>
+
+  <div class="new">
+    <p class="lead"><strong>New researcher?</strong> Start by creating an account.</p>
+    <a id="signup_link" class="btn" href="signup.html">Create an account</a>
+    <p class="fine">Free and open to all researchers. A verification email follows.</p>
+  </div>
+
+  <hr class="sep">
+  <p class="lead existing"><strong>Already have an account?</strong> Sign in with your email and password.</p>
+
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
   <input type="hidden" name="mcp_state" id="mcp_state">
@@ -42,8 +62,7 @@
   <label>Password</label>
   <div class="pw"><input name="password" type="password" required autocomplete="current-password"><button type="button" class="eye" aria-label="Show password" title="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button></div>
   <button type="submit">Sign in</button>
-  <p class="sub">New researcher? <a id="signup_link" href="signup.html" style="color:#7a1f1f">Create an account</a></p>
-  <p class="sub" style="margin-top:8px">Forgot your password? <a id="reset_link" href="reset.html" style="color:#7a1f1f">Reset it</a></p>
+  <p class="sub">Forgot your password? <a id="reset_link" href="reset.html" style="color:#7a1f1f">Reset it</a></p>
   <p class="sub" style="margin-top:8px"><a href="connect.html" style="color:#7a1f1f">Trouble connecting? Read the connection guide</a>
   · <a href="privacy.html" style="color:#7a1f1f">Privacy note</a></p>
 </form>
@@ -53,7 +72,7 @@
   var link = document.getElementById('signup_link');
   link.href = 'signup.html' + (p.get('state') ? ('?state=' + encodeURIComponent(p.get('state'))) : '');
   var errs = {
-    invalid: 'Invalid credentials. Please try again.',
+    invalid: 'Wrong email or password. No account yet? Create one first with the button above.',
     expired: 'Your login session expired. Close this window and reconnect from your AI client.',
     unverified: 'Please verify your email first (check your inbox), then sign in again.',
     exists: 'An account with this email already exists and is verified. Sign in with your password.'
