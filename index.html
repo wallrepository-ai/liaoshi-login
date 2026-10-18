@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sign in: AID</title>
+<title data-tpl="Sign in: {short}">Sign in: AID</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
          justify-content: center; padding-top: 8vh; margin: 0; }
@@ -42,8 +42,8 @@
 <body>
 <form class="card" method="POST"
       action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/login">
-  <h2 style="margin:0 0 6px">AID</h2>
-  <p class="muted">Connect your AI client to the AID research database.</p>
+  <h2 style="margin:0 0 6px"><span data-name="short">AID</span></h2>
+  <p class="muted">Connect your AI client to the <span data-name="short">AID</span> research database.</p>
 
   <div class="new">
     <p class="lead"><strong>New researcher?</strong> Start by creating an account.</p>

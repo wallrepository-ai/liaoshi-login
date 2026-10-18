@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>How to connect: AID</title>
+<title data-tpl="How to connect: {short}">How to connect: AID</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #f5f2ea; margin: 0;
          color: #222; }
@@ -32,16 +32,16 @@
 </head>
 <body>
 <header>
-  <h1>AID (AI and Database)</h1>
+  <h1><span data-name="full">AID (AI and Database)</span></h1>
   <p>Connecting from Claude or another AI client: sign in once, approve the tools once.</p>
 </header>
 <main>
 
   <div class="cat">1 · Add the connector</div>
   <div class="bit">
-    <h2>Add AID as a custom connector</h2>
+    <h2>Add <span data-name="short">AID</span> as a custom connector</h2>
     <p>In Claude open <strong>Customize → Connectors → Add custom connector</strong>,
-    give it a name (for example <em>AID</em>) and paste this URL:</p>
+    give it a name (for example <em><span data-name="short">AID</span></em>) and paste this URL:</p>
     <p><code>https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server</code></p>
     <p>Other MCP-capable clients (Claude Desktop, ChatGPT, and others) take the same URL.
     A free Claude account can hold one custom connector.</p>
@@ -60,7 +60,7 @@
 
   <div class="cat">3 · The permission cards</div>
   <div class="bit">
-    <h2>"Claude wants to use Query from AID"</h2>
+    <h2>"Claude wants to use Query from <span data-name="short">AID</span>"</h2>
     <p>Claude asks before it uses any tool of a custom connector for the first time.
     This is Claude's own safety step, not a sign-in problem, and the database cannot
     switch it off. You will see one card per tool:</p>

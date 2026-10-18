@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reset your password: AID</title>
+<title data-tpl="Reset your password: {short}">Reset your password: AID</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
          justify-content: center; padding-top: 8vh; margin: 0; }
@@ -24,7 +24,7 @@
 <form class="card" method="POST"
       action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/recover">
   <h2 style="margin:0 0 6px">Reset your password</h2>
-  <p class="muted">Enter the email address of your AID account. You will receive a link to
+  <p class="muted">Enter the email address of your <span data-name="short">AID</span> account. You will receive a link to
   choose a new password.</p>
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>

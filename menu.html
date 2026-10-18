@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AID — menu</title>
+<title data-tpl="Menu: {short}">Menu: AID</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #f5f2ea; margin: 0;
          color: #222; }
@@ -25,8 +25,8 @@
 </head>
 <body>
 <header>
-  <h1>AID</h1>
-  <p>A scholarly database of the Liaoshi and related data, queried from your AI chat client. This menu is also available inside any chat: just type <strong>menu</strong>.</p>
+  <h1><span data-name="short">AID</span></h1>
+  <p>A scholarly database of <span data-name="scope">the Chinese standard histories and related sources for the history of Inner and East Asia</span>, queried from your AI chat client. This menu is also available inside any chat: just type <strong>menu</strong>.</p>
 </header>
 <main id="main"><p id="loading">Loading…</p></main>
 <script>

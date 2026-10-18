@@ -2,7 +2,7 @@
 
 ## What this repository is
 
-The public GitHub Pages host for the AID (AI and Database) connector's sign-in pages. It holds
+The public GitHub Pages host for the project's connector sign-in pages. It holds
 eight static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
 
 Served at: https://wallrepository-ai.github.io/liaoshi-login/
@@ -97,3 +97,7 @@ continuous paragraphs.
 
 This repository is public. Never add a key, token, password, Supabase service role
 credential, or private URL. The connector URL is public by design; nothing else is.
+
+## The project's name
+
+The project's name is a variable, the row `public.project_identity` in the database (task PNV in `sources`). On these pages every name sits in a marked element, for example `<span data-name="short">AID</span>`, and every `<title>` carries its pattern (`data-tpl="Sign in: {short}"`); the text inside is real, so the pages work without JavaScript. Never type the name by hand outside a mark. To change the name: change the row, then from `sources` run `python3 refinement/scripts/project_name.py sync` (it rewrites the marks and the public document's banner) and `check` (must print OK), then commit both repositories. Frozen identifiers that embed the old name (this repository's own name and address, the ticket prefix, the mailbox) do not follow the variable.

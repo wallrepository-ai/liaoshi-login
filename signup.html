@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Create account: AID</title>
+<title data-tpl="Create account: {short}">Create account: AID</title>
 <style>
   body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
          justify-content: center; padding-top: 8vh; margin: 0; }
@@ -36,7 +36,7 @@
 <form class="card" method="POST"
       action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/signup">
   <h2 style="margin:0 0 6px" id="title">Create your researcher account</h2>
-  <p class="muted" id="intro">AID (AI and Database). Registration is free and open to all researchers.</p>
+  <p class="muted" id="intro"><span data-name="full">AID (AI and Database)</span>. Registration is free and open to all researchers.</p>
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
   <input type="hidden" name="mcp_state" id="mcp_state">
@@ -47,8 +47,8 @@
   <div class="pw"><input name="password" type="password" required minlength="6" autocomplete="new-password"><button type="button" class="eye" aria-label="Show password" title="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button></div>
   <label>Repeat password</label>
   <div class="pw"><input name="password2" type="password" required minlength="6" autocomplete="new-password"><button type="button" class="eye" aria-label="Show password" title="Show password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="3" x2="21" y2="21"/></svg></button></div>
-  <label class="choice"><input type="checkbox" name="feedback" id="feedback" value="yes" checked>
-  <span>I would like feedback from AID: replies about comments I submit and news about the
+  <label class="choice"><input type="checkbox" name="feedback" id="feedback" value="yes">
+  <span>I would like feedback from <span data-name="short">AID</span>: replies about comments I submit and news about the
   database. I can withdraw at any time. <a href="privacy.html" style="color:#7a1f1f">Privacy note</a></span></label>
   <button type="submit">Create account</button>
   <p class="note">You will receive a verification email. After confirming, return to your
