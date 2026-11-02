@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title data-tpl="Alarm action: {short}">Alarm action: AID</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
+         justify-content: center; padding: 10vh 16px 0; margin: 0; }
+  .card { background: #fff; padding: 32px; border-radius: 10px; width: 380px; max-width: 100%;
+          box-sizing: border-box; box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+  h2 { margin: 0 0 10px; }
+  p { color: #555; margin: 0 0 12px; }
+  button { width: 100%; padding: 10px; background: #7a1f1f; color: #fff; border: none;
+           border-radius: 6px; font-size: 15px; cursor: pointer; }
+  .small { font-size: 13px; color: #777; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2 id="title"><span data-name="short">AID</span> alarm action</h2>
+  <p id="msg">Reading the link...</p>
+  <form id="form" method="POST" style="display:none"
+        action="https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server/alarm/act">
+    <input type="hidden" name="t" id="t">
+    <button type="submit" id="go">Confirm</button>
+  </form>
+  <p class="small" id="note" style="margin-top:14px">This page belongs to the alarm system of the
+  <span data-name="short">AID</span> project. Nothing happens until the button is pressed; each link works once.</p>
+</div>
+<script>
+  // Task ALM (sources/docs/ALM_DESIGN.md section 7): an alarm email links here with ?t=<token>.
+  // The page only reads what the link would do; the action runs on the button (a POST), so a mail
+  // scanner that opens the link changes nothing. The server answers back here with ?done=&result=.
+  var API = 'https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server';
+  var q = new URLSearchParams(location.search);
+  var msg = document.getElementById('msg');
+  if (q.has('done')) {
+    document.getElementById('title').textContent = q.get('done') === '1' ? 'Done' : 'Not done';
+    msg.textContent = q.get('result') || '';
+  } else if (!/^[0-9a-f]{64}$/.test(q.get('t') || '')) {
+    msg.textContent = 'This link is incomplete. Open it again from the alarm email.';
+  } else {
+    fetch(API + '/alarm/link?t=' + q.get('t')).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.valid) { msg.textContent = 'This link cannot be used: ' + (d.reason || 'unknown') + '.'; return; }
+      msg.textContent = d.label + '. Alarm ' + d.alarm_id + ': ' + d.alarm + '. The link expires ' + d.expires + '.';
+      document.getElementById('t').value = q.get('t');
+      document.getElementById('go').textContent = 'Confirm: ' + d.label;
+      document.getElementById('form').style.display = 'block';
+    }).catch(function () { msg.textContent = 'The server could not be reached. Try again in a minute.'; });
+  }
+</script>
+</body>
+</html>

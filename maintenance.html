@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title data-tpl="Maintenance: {short}">Maintenance: AID</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
+         justify-content: center; padding: 10vh 16px 0; margin: 0; }
+  .card { background: #fff; padding: 32px; border-radius: 10px; width: 360px; max-width: 100%;
+          box-sizing: border-box; box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+  h2 { margin: 0 0 10px; }
+  p { color: #555; margin: 0 0 12px; }
+  .admin { font-size: 13px; margin: 18px 0 0; display: none; }
+  .admin a { color: #7a1f1f; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2 id="title">Down for maintenance</h2>
+  <p id="msg">We are sorry, the system is down for maintenance. Please return later.</p>
+  <p>The <span data-name="short">AID</span> research database will be back shortly. Your account and your
+  connection are kept; when the service is open again, your AI client works as before.</p>
+  <p class="admin" id="admin"><a id="adminlink" href="./">Administrators: sign in</a></p>
+</div>
+<script>
+  // Task ALM (sources/docs/ALM_DESIGN.md section 8): the sign-in routes send the browser here in
+  // maintenance (?state= keeps an administrator's sign-in possible) and when too many attempts
+  // came from one network (?k=busy). No form on this page.
+  var q = new URLSearchParams(location.search);
+  if (q.get('k') === 'busy') {
+    document.getElementById('title').textContent = 'Please try again later';
+    document.getElementById('msg').textContent =
+      'There were too many attempts from your network. Please try again in an hour.';
+  }
+  var st = q.get('state');
+  if (st) {
+    document.getElementById('adminlink').href = './?state=' + encodeURIComponent(st);
+    document.getElementById('admin').style.display = 'block';
+  }
+</script>
+</body>
+</html>

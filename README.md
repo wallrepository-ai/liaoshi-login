@@ -52,3 +52,7 @@ Sources: Claude Help Center, "Get started with custom connectors using remote MC
 (support.claude.com/en/articles/11175166) and "Use connectors to extend Claude's
 capabilities" (support.claude.com/en/articles/11176164); the MCP specification of
 2025-06-18, Tools, Annotations; anthropics/claude-ai-mcp issues 491, 493 and 1032.
+
+## Maintenance and alarm pages
+
+`maintenance.html` is the page researchers see when the service is switched to maintenance or when too many sign-in attempts came from their network; it has no form. `action.html` is the confirmation page behind the action links of the project's alarm emails: opening a link only shows what it would do, and the action runs when its button is pressed. Both belong to task ALM in the private `sources` repository (`docs/ALM_DESIGN.md`).

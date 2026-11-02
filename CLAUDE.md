@@ -3,7 +3,7 @@
 ## What this repository is
 
 The public GitHub Pages host for the project's connector sign-in pages. It holds
-eight static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
+ten static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
 
 Served at: https://wallrepository-ai.github.io/liaoshi-login/
 
@@ -17,6 +17,8 @@ Served at: https://wallrepository-ai.github.io/liaoshi-login/
 | `reset.html` | Password reset, step 1: the address; posts to `/recover` |
 | `newpassword.html` | Password reset, step 2: the new password; the reset email's link lands here with a token in the URL fragment; posts to `/password` |
 | `privacy.html` | Privacy note linked from sign-up, sign-in and the menu (draft of 2026-10-12, owner to confirm) |
+| `maintenance.html` | "Down for maintenance" page, no form (task ALM): the sign-in routes send the browser here in maintenance (`?state=` shows a small administrators' sign-in link) and when an alarm blocked the browser's network (`?k=busy`) |
+| `action.html` | Confirmation page of the alarm emails' action links (task ALM): reads `?t=` from `/alarm/link`, its button posts `t` to `/alarm/act`, which answers back with `?done=&result=` |
 
 ## The main project is elsewhere
 
