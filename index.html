@@ -56,6 +56,7 @@
 
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
+  <p class="muted" id="spamnote" hidden>Not in your inbox after a few minutes? Look in your spam or junk folder for a message from <span data-name="short">AID</span> (<span data-param="researcher_mailbox">AID.research.feedback@gmail.com</span>) and mark it as not spam, so that later messages arrive normally.</p>
   <input type="hidden" name="mcp_state" id="mcp_state">
   <label>Email</label>
   <input name="email" type="email" id="email" required autocomplete="username">
@@ -87,6 +88,7 @@
     var el = document.getElementById('err');
     el.textContent = errs[p.get('error')] || 'Sign-in failed. Please try again.';
     el.hidden = false;
+    if (p.get('error') === 'unverified') document.getElementById('spamnote').hidden = false;
   }
   if (p.get('notice') && notices[p.get('notice')]) {
     var ok = document.getElementById('ok');

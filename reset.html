@@ -28,6 +28,7 @@
   choose a new password.</p>
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
+  <p class="muted" id="spamnote" hidden>Not in your inbox after a few minutes? Look in your spam or junk folder for a message from <span data-name="short">AID</span> (<span data-param="researcher_mailbox">AID.research.feedback@gmail.com</span>) and mark it as not spam, so that later messages arrive normally.</p>
   <label>Email</label>
   <input name="email" id="email" type="email" required autocomplete="username">
   <button type="submit">Send reset link</button>
@@ -43,6 +44,7 @@
     ok.textContent = 'If this address has an account, a reset link is on its way. Check your ' +
                      'inbox; the link is valid for one hour.';
     ok.hidden = false;
+    document.getElementById('spamnote').hidden = false;
   }
   if (p.get('error')) {
     var el = document.getElementById('err');

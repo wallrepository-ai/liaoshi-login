@@ -39,6 +39,7 @@
   <p class="muted" id="intro"><span data-name="full">AID (AI and Database)</span>. Registration is free and open to all researchers.</p>
   <p class="err" id="err" hidden></p>
   <p class="ok" id="ok" hidden></p>
+  <p class="muted" id="spamnote" hidden>Not in your inbox after a few minutes? Look in your spam or junk folder for a message from <span data-name="short">AID</span> (<span data-param="researcher_mailbox">AID.research.feedback@gmail.com</span>) and mark it as not spam, so that later messages arrive normally.</p>
   <input type="hidden" name="mcp_state" id="mcp_state">
   <div id="fields">
   <label>Email</label>
@@ -68,6 +69,7 @@
     ok.textContent = 'Account requested. Check your inbox and click the verification link, ' +
                      'then return to your AI client, connect again, and sign in.';
     ok.hidden = false;
+    document.getElementById('spamnote').hidden = false;
     document.getElementById('title').textContent = 'Account requested';
     document.getElementById('intro').hidden = true;
     document.getElementById('fields').hidden = true;
