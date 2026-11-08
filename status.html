@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title data-tpl="Status: {short}">Status: AID</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f5f2ea; display: flex;
+         justify-content: center; padding: 6vh 16px 32px; margin: 0; color: #222; }
+  .card { background: #fff; padding: 28px; border-radius: 10px; width: 560px; max-width: 100%;
+          box-sizing: border-box; box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+  h2 { margin: 0 0 6px; }
+  h3 { margin: 22px 0 8px; font-size: 15px; }
+  p { color: #555; margin: 0 0 12px; line-height: 1.45; }
+  .lead { font-size: 17px; color: #222; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+  li span:last-child { text-align: right; }
+  .ok { color: #2d6a2d; } .warn { color: #8a5a00; } .bad { color: #9b1c1c; } .muted { color: #888; }
+  .msg { background: #fbf6e8; border-left: 3px solid #c9a227; padding: 10px 12px; margin: 10px 0; font-size: 14px; color: #333; }
+  a { color: #7a1f1f; }
+  .small { font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Status of <span data-name="short">AID</span></h2>
+  <p class="lead" id="lead">Checking…</p>
+  <div id="msgs"></div>
+
+  <h3><span data-name="short">AID</span></h3>
+  <ul id="aid">
+    <li><span>Answers to your chatbot</span><span class="muted" id="c-answers">checking</span></li>
+    <li><span>Sign-in and new connections</span><span class="muted" id="c-sign_in">checking</span></li>
+    <li><span>Saving comments</span><span class="muted" id="c-saving">checking</span></li>
+  </ul>
+
+  <h3>The companies <span data-name="short">AID</span> depends on</h3>
+  <ul id="outside">
+    <li><span>Supabase (database and server host) · <a href="https://status.supabase.com" target="_blank" rel="noopener">status</a></span><span class="muted" id="o-supabase">checking</span></li>
+    <li><span>GitHub (sign-in pages) · <a href="https://www.githubstatus.com" target="_blank" rel="noopener">status</a></span><span class="muted" id="o-github">checking</span></li>
+  </ul>
+
+  <h3>Your chatbot's company</h3>
+  <ul id="bots">
+    <li><span>Anthropic (Claude) · <a href="https://status.claude.com" target="_blank" rel="noopener">status</a></span><span class="muted" id="o-anthropic">checking</span></li>
+    <li><span>OpenAI (ChatGPT) · <a href="https://status.openai.com" target="_blank" rel="noopener">status</a></span><span class="muted" id="o-openai">checking</span></li>
+    <li><span>Google (Gemini) · <a href="https://status.cloud.google.com" target="_blank" rel="noopener">status</a></span><span class="muted">see Google's page</span></li>
+  </ul>
+
+  <h3>Still no answer?</h3>
+  <p class="small">If everything above is operational and your chatbot still gets no answer from <span data-name="short">AID</span>,
+  the problem may be your own network or your chatbot's connection to <span data-name="short">AID</span>; reconnecting the
+  connector in your chatbot's settings often helps. Please tell us:
+  <a id="mail" href="#">write to <span data-param="researcher_mailbox">AID.research.feedback@gmail.com</span></a>
+  (the message is filled in with the time and what this page saw).</p>
+  <p class="small muted" id="checked"></p>
+</div>
+<script>
+  // Task DTR (sources/docs/DTR_DESIGN.md section 7): the page the chatbot guide points to when a tool call fails
+  // with no [status] line. It reads AID's own status from the server and, in the reader's own browser, the public
+  // status of Supabase, GitHub, Anthropic and OpenAI, so it still says something useful when AID's server is down.
+  var N = (document.querySelector('[data-name="short"]') || {}).textContent || '';
+  var API = 'https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server';
+  var WORDS = { operational: ['Operational', 'ok'], degraded_performance: ['Slow', 'warn'], partial_outage: ['Partly down', 'warn'],
+                major_outage: ['Down', 'bad'], under_maintenance: ['Maintenance', 'warn'] };
+  var IND = { none: ['Operational', 'ok'], minor: ['Minor problems', 'warn'], major: ['Major problems', 'bad'],
+              critical: ['Down', 'bad'], maintenance: ['Maintenance', 'warn'] };
+  var seen = [];
+  function put(id, pair) {
+    var el = document.getElementById(id); if (!el) return;
+    el.textContent = pair[0]; el.className = pair[1];
+  }
+  function msg(text) {
+    var d = document.createElement('div'); d.className = 'msg'; d.textContent = text;
+    document.getElementById('msgs').appendChild(d);
+  }
+  function timeout(ms) { var c = new AbortController(); setTimeout(function () { c.abort(); }, ms); return c.signal; }
+  function outside(id, url) {
+    return fetch(url, { signal: timeout(8000) }).then(function (r) { return r.json(); }).then(function (j) {
+      var s = j.status || {}; var w = IND[s.indicator] || [s.description || 'unknown', 'muted'];
+      if (s.indicator && s.indicator !== 'none') w = [s.description || w[0], w[1]];
+      put(id, w); seen.push(id + ': ' + (s.description || s.indicator));
+      return s.indicator;
+    }).catch(function () { put(id, ['could not be read', 'muted']); seen.push(id + ': not read'); return null; });
+  }
+  var aid = fetch(API + '/status', { signal: timeout(10000) }).then(function (r) { return r.json(); }).then(function (s) {
+    var c = s.components || {};
+    ['answers', 'sign_in', 'saving'].forEach(function (k) { put('c-' + k, WORDS[c[k]] || [c[k] || 'unknown', 'muted']); });
+    (s.incidents || []).forEach(function (i) { if (i.message) msg(i.message.replace(/^\[status\]\s*/, '')); });
+    if (s.service_mode === 'maintenance') msg(N + ' is down for maintenance. Please return later.');
+    seen.push(N + ': ' + (c.answers || s.error || '?'));
+    return c.answers || (s.error ? 'major_outage' : 'unknown');
+  }).catch(function () {
+    ['answers', 'sign_in', 'saving'].forEach(function (k) { put('c-' + k, ['not reachable', 'bad']); });
+    seen.push(N + ': not reachable');
+    return 'unreachable';
+  });
+  Promise.all([aid, outside('o-supabase', 'https://status.supabase.com/api/v2/status.json'),
+               outside('o-github', 'https://www.githubstatus.com/api/v2/status.json'),
+               outside('o-anthropic', 'https://status.claude.com/api/v2/status.json'),
+               outside('o-openai', 'https://status.openai.com/api/v2/status.json')]).then(function (r) {
+    var a = r[0], sb = r[1], bad = function (x) { return x && x !== 'none'; };
+    var lead = document.getElementById('lead');
+    if (a === 'operational' && !bad(r[3]) && !bad(r[4])) lead.textContent = N + ' is answering normally.';
+    else if (a === 'operational') lead.textContent = N + ' is answering normally; a chatbot company reports problems (below), which can stop your chatbot from reaching ' + N + '.';
+    else if (a === 'unreachable' && bad(sb)) lead.textContent = N + ' cannot be reached from your browser, and Supabase, which hosts ' + N + ', reports problems: the cause is most likely on Supabase\'s side. Please try again later.';
+    else if (a === 'unreachable') lead.textContent = N + '\'s server cannot be reached from your browser. Supabase, which hosts it, reports no problem, so the cause is not yet known. Please try again in a few minutes.';
+    else lead.textContent = N + ' has a problem at the moment; see the details below.';
+    var now = new Date();
+    document.getElementById('checked').textContent = 'Checked ' + now.toISOString().slice(0, 16).replace('T', ' ') + ' UTC. Reload the page to check again.';
+    var addr = document.querySelector('[data-param="researcher_mailbox"]').textContent.trim();
+    var body = N + ' did not answer my chatbot.\n\nTime (UTC): ' + now.toISOString() + '\nChatbot: \nWhat I asked: \n\nThis page saw: ' + seen.join('; ');
+    document.getElementById('mail').href = 'mailto:' + addr + '?subject=' + encodeURIComponent(N + ' did not answer') + '&body=' + encodeURIComponent(body);
+  });
+</script>
+</body>
+</html>

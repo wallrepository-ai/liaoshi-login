@@ -3,7 +3,7 @@
 ## What this repository is
 
 The public GitHub Pages host for the project's connector sign-in pages. It holds
-ten static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
+eleven static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
 
 Served at: https://wallrepository-ai.github.io/liaoshi-login/
 
@@ -19,6 +19,7 @@ Served at: https://wallrepository-ai.github.io/liaoshi-login/
 | `privacy.html` | Privacy note linked from sign-up, sign-in and the menu (draft of 2026-10-12, owner to confirm) |
 | `maintenance.html` | "Down for maintenance" page, no form (task ALM): the sign-in routes send the browser here in maintenance (`?state=` shows a small administrators' sign-in link) and when an alarm blocked the browser's network (`?k=busy`) |
 | `action.html` | Confirmation page of the alarm emails' action links (task ALM): reads `?t=` from `/alarm/link`, its button posts `t` to `/alarm/act`, which answers back with `?done=&result=` |
+| `status.html` | Public status page (task DTR): AID's own status from the server's `/status`, and, read by the visitor's browser, the status of Supabase, GitHub, Anthropic and OpenAI; the chatbot guide points researchers here when a tool call gets no answer; a prefilled mail to the researcher mailbox. No form |
 
 ## The main project is elsewhere
 

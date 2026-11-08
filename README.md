@@ -56,3 +56,5 @@ capabilities" (support.claude.com/en/articles/11176164); the MCP specification o
 ## Maintenance and alarm pages
 
 `maintenance.html` is the page researchers see when the service is switched to maintenance or when too many sign-in attempts came from their network; it has no form. `action.html` is the confirmation page behind the action links of the project's alarm emails: opening a link only shows what it would do, and the action runs when its button is pressed. Both belong to task ALM in the private `sources` repository (`docs/ALM_DESIGN.md`).
+
+`status.html` is the public status page (task DTR, `docs/DTR_DESIGN.md` in `sources`): it shows whether the service is answering, from the server's `/status`, and reads the public status of Supabase, GitHub, Anthropic and OpenAI in the visitor's own browser, so it still says something useful when the server itself cannot be reached. The chatbot guide sends researchers here when a tool call gets no answer. It has no form; its mail link opens the visitor's own mail program.
