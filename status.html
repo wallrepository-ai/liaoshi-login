@@ -59,8 +59,8 @@
 </div>
 <script>
   // Task DTR (sources/docs/DTR_DESIGN.md section 7): the page the chatbot guide points to when a tool call fails
-  // with no [status] line. It reads AID's own status from the server and, in the reader's own browser, the public
-  // status of Supabase, GitHub, Anthropic and OpenAI, so it still says something useful when AID's server is down.
+  // with no [status] line. It reads the service's own status from the server and, in the reader's own browser, the public
+  // status of Supabase, GitHub, Anthropic and OpenAI, so it still says something useful when the server is down.
   var N = (document.querySelector('[data-name="short"]') || {}).textContent || '';
   var API = 'https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server';
   var WORDS = { operational: ['Operational', 'ok'], degraded_performance: ['Slow', 'warn'], partial_outage: ['Partly down', 'warn'],
