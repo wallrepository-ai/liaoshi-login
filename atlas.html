@@ -86,7 +86,9 @@
     var atlas = L.imageOverlay(d.image_url, bounds, { opacity: 0.65, alt: d.caption }).addTo(map);
     var ring = L.circle([d.lat, d.lon], { radius: (d.accuracy_km || 5) * 1000, color: '#7a2e8e', weight: 2.5,
       dashArray: '7 6', fillColor: '#7a2e8e', fillOpacity: 0.06 }).addTo(map);
-    ring.bindTooltip(d.name_zh + ' (atlas, approximate)', { permanent: true, direction: 'top', className: 'al', offset: [0, -4] });
+    // the label sits on top of the ring, so it does not cover the printed name inside it
+    L.circleMarker([Number(d.lat) + (d.accuracy_km || 5) / 111.2, d.lon], { radius: 0.1, opacity: 0, fillOpacity: 0 }).addTo(map)
+      .bindTooltip(d.name_zh + ' (atlas, approximate)', { permanent: true, direction: 'top', className: 'al', offset: [0, -2] });
     var pins = L.layerGroup();
     (d.pins || []).forEach(function (p) {
       L.circleMarker([p.lat, p.lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#c62828', fillOpacity: 1 })
