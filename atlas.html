@@ -51,7 +51,7 @@
     <label><input type="checkbox" id="streets"> street map instead of satellite</label>
     <a id="pm" href="#" target="_blank" rel="noopener">Open the <span data-name="short">AID</span> map here</a>
   </div>
-  <details id="det"><summary>Source, accuracy and rights</summary><p class="src" id="src"></p></details>
+  <details id="det"><summary>Accuracy and map credits</summary><p class="src" id="src"></p></details>
   <p class="src" id="short"></p>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -68,10 +68,10 @@
     var zh = document.createElement('span'); zh.className = 'zh'; zh.textContent = d.name_zh;
     t.appendChild(zh); t.appendChild(document.createTextNode(' in the historical atlas' + (d.year_ce ? ' (' + d.year_ce + ' CE)' : '')));
     $('caption').textContent = d.caption + ' Move the slider to fade between the printed atlas and the satellite image.';
-    $('src').textContent = d.rights_note + ' Position: about ' +
+    $('src').textContent = 'Position: about ' +
       Number(d.lat).toFixed(2) + '° N, ' + Number(d.lon).toFixed(2) + '° E, within roughly ' + d.accuracy_km +
       ' km. ' + (d.sheet && d.sheet.georef_check ? 'Placement check: ' + d.sheet.georef_check + ' ' : '') +
-      'Status: ' + d.status + '. Satellite imagery: Esri, Maxar, Earthstar Geographics. Street map: OpenStreetMap contributors.';
+      'Satellite imagery: Esri, Maxar, Earthstar Geographics. Street map: OpenStreetMap contributors.';
     $('short').textContent = 'Source: ' + d.source_line;
     $('pm').href = d.project_map_url;
     $('map').hidden = false; $('bar').hidden = false;
