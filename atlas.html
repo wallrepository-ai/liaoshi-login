@@ -45,7 +45,7 @@
     <span>Atlas</span>
   </div>
   <div class="row">
-    <span><i class="key ring"></i><span class="approx">Approximate position</span> read off the atlas, not a located site</span>
+    <span><i class="key ring"></i><span class="approx">Approximate position</span> <span id="approxtext">read off the atlas, not a located site</span></span>
     <span><i class="key pin"></i>Pin of the <span data-name="short">AID</span> map: a site seen on the satellite image</span>
     <label><input type="checkbox" id="pins" checked> show pins</label>
     <label><input type="checkbox" id="streets"> street map instead of satellite</label>
@@ -68,7 +68,7 @@
     var zh = document.createElement('span'); zh.className = 'zh'; zh.textContent = d.name_zh;
     t.appendChild(zh); t.appendChild(document.createTextNode(' in the historical atlas' + (d.year_ce ? ' (' + d.year_ce + ' CE)' : '')));
     $('caption').textContent = d.caption + ' Move the slider to fade between the printed atlas and the satellite image.';
-    $('src').textContent = 'Position: about ' +
+    $('src').textContent = (d.accuracy_note ? d.accuracy_note + ' ' : '') + (line ? 'Middle of the course: about ' : 'Position: about ') +
       Number(d.lat).toFixed(2) + '° N, ' + Number(d.lon).toFixed(2) + '° E, within roughly ' + d.accuracy_km +
       ' km. ' + (d.sheet && d.sheet.georef_check ? 'Placement check: ' + d.sheet.georef_check + ' ' : '') +
       'Satellite imagery: Esri, Maxar, Earthstar Geographics. Street map: OpenStreetMap contributors.';
@@ -77,18 +77,28 @@
     $('map').hidden = false; $('bar').hidden = false;
 
     var b = d.bbox, bounds = L.latLngBounds([b[1], b[0]], [b[3], b[2]]);
-    var map = L.map('map', { zoomSnap: 0.25, maxBounds: bounds.pad(1.5), minZoom: 6, maxZoom: 17 });
+    var map = L.map('map', { zoomSnap: 0.25, maxBounds: bounds.pad(1.5), minZoom: 4, maxZoom: 17 });
     var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       { maxZoom: 17, attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics' });
     var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       { maxZoom: 17, attribution: '&copy; OpenStreetMap contributors' });
     sat.addTo(map);
     var atlas = L.imageOverlay(d.image_url, bounds, { opacity: 0.65, alt: d.caption }).addTo(map);
-    var ring = L.circle([d.lat, d.lon], { radius: (d.accuracy_km || 5) * 1000, color: '#7a2e8e', weight: 2.5,
-      dashArray: '7 6', fillColor: '#7a2e8e', fillOpacity: 0.06 }).addTo(map);
-    // the label sits on top of the ring, so it does not cover the printed name inside it
-    L.circleMarker([Number(d.lat) + (d.accuracy_km || 5) / 111.2, d.lon], { radius: 0.1, opacity: 0, fillOpacity: 0 }).addTo(map)
-      .bindTooltip(d.name_zh + ' (atlas, approximate)', { permanent: true, direction: 'top', className: 'al', offset: [0, -2] });
+    var line = d.geometry && d.geometry.type === 'LineString';
+    var tag = d.name_zh + ' (atlas, approximate)';
+    if (line) {
+      // a river: its course as traced from the atlas, drawn as a dashed line over the corridor cut
+      var pts = d.geometry.coordinates.map(function (c) { return [c[1], c[0]]; });
+      L.polyline(pts, { color: '#7a2e8e', weight: 2.5, dashArray: '7 6', opacity: 0.9 }).addTo(map)
+        .bindTooltip(tag, { permanent: true, direction: 'top', className: 'al', offset: [0, -6] });
+      document.getElementById('approxtext').textContent = 'course traced from the atlas, not a surveyed line';
+    } else {
+      L.circle([d.lat, d.lon], { radius: (d.accuracy_km || 5) * 1000, color: '#7a2e8e', weight: 2.5,
+        dashArray: '7 6', fillColor: '#7a2e8e', fillOpacity: 0.06 }).addTo(map);
+      // the label sits on top of the ring, so it does not cover the printed name inside it
+      L.circleMarker([Number(d.lat) + (d.accuracy_km || 5) / 111.2, d.lon], { radius: 0.1, opacity: 0, fillOpacity: 0 }).addTo(map)
+        .bindTooltip(tag, { permanent: true, direction: 'top', className: 'al', offset: [0, -2] });
+    }
     var pins = L.layerGroup();
     (d.pins || []).forEach(function (p) {
       L.circleMarker([p.lat, p.lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#c62828', fillOpacity: 1 })
