@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title data-tpl="Historical atlas view: {short}">Historical atlas view: AID</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  html, body { height: 100%; margin: 0; }
+  body { font-family: system-ui, sans-serif; color: #222; background: #f5f2ea; display: flex; flex-direction: column; }
+  header { padding: 10px 14px 8px; background: #fff; border-bottom: 1px solid #ddd; }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  h1 .zh { font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif; }
+  #caption { margin: 0; font-size: 14px; color: #444; line-height: 1.4; }
+  #map { flex: 1; min-height: 55vh; background: #ddd; }
+  details { margin-top: 8px; font-size: 13px; color: #444; } summary { cursor: pointer; }
+  .bar { background: #fff; border-top: 1px solid #ddd; padding: 10px 14px; }
+  .slide { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+  .slide input { flex: 1; min-width: 80px; accent-color: #7a2e8e; height: 28px; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; margin-top: 8px; font-size: 13px; color: #444; }
+  .row label { cursor: pointer; }
+  .key { display: inline-block; vertical-align: -2px; margin-right: 5px; }
+  .ring { width: 12px; height: 12px; border: 2px dashed #7a2e8e; border-radius: 50%; }
+  .pin { width: 10px; height: 10px; background: #c62828; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #c62828; }
+  .src { margin: 8px 0 0; font-size: 12.5px; color: #555; line-height: 1.45; }
+  .approx { color: #7a2e8e; font-weight: 600; }
+  a { color: #7a1f1f; }
+  #msg { padding: 24px 16px; font-size: 16px; }
+  .leaflet-tooltip.pl { background: #fff; border: 1px solid #c62828; color: #8e1616; font-size: 12px; padding: 1px 5px; }
+  .leaflet-tooltip.al { background: #fff; border: 1px solid #7a2e8e; color: #3d1249; font-size: 13px; font-weight: 600; padding: 1px 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Historical atlas view</h1>
+  <p id="caption">Loading the map…</p>
+</header>
+<div id="map" hidden></div>
+<p id="msg" hidden></p>
+<div class="bar" id="bar" hidden>
+  <div class="slide">
+    <span>Satellite</span>
+    <input id="fade" type="range" min="0" max="100" value="65" aria-label="Fade between the satellite map and the atlas">
+    <span>Atlas</span>
+  </div>
+  <div class="row">
+    <span><i class="key ring"></i><span class="approx">Approximate position</span> read off the atlas, not a located site</span>
+    <span><i class="key pin"></i>Pin of the <span data-name="short">AID</span> map: a site seen on the satellite image</span>
+    <label><input type="checkbox" id="pins" checked> show pins</label>
+    <label><input type="checkbox" id="streets"> street map instead of satellite</label>
+    <a id="pm" href="#" target="_blank" rel="noopener">Open the <span data-name="short">AID</span> map here</a>
+  </div>
+  <details id="det"><summary>Source, accuracy and rights</summary><p class="src" id="src"></p></details>
+  <p class="src" id="short"></p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function () {
+  var API = 'https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/atlas-view';
+  var $ = function (id) { return document.getElementById(id); };
+  function fail(text) { $('caption').textContent = ''; $('msg').textContent = text; $('msg').hidden = false; }
+  var code = new URLSearchParams(location.search).get('s') || '';
+  if (!/^[A-Za-z0-9_-]{1,80}$/.test(code)) { fail('This link names no atlas snippet. Ask your chatbot for the place again.'); return; }
+  fetch(API + '?s=' + encodeURIComponent(code)).then(function (r) { return r.json(); }).then(function (d) {
+    if (d.error) { fail(d.error); return; }
+    var t = $('title'); t.textContent = '';
+    var zh = document.createElement('span'); zh.className = 'zh'; zh.textContent = d.name_zh;
+    t.appendChild(zh); t.appendChild(document.createTextNode(' in the historical atlas' + (d.year_ce ? ' (' + d.year_ce + ' CE)' : '')));
+    $('caption').textContent = d.caption + ' Move the slider to fade between the printed atlas and the satellite image.';
+    $('src').textContent = d.rights_note + ' Position: about ' +
+      Number(d.lat).toFixed(2) + '° N, ' + Number(d.lon).toFixed(2) + '° E, within roughly ' + d.accuracy_km +
+      ' km. ' + (d.sheet && d.sheet.georef_check ? 'Placement check: ' + d.sheet.georef_check + ' ' : '') +
+      'Status: ' + d.status + '. Satellite imagery: Esri, Maxar, Earthstar Geographics. Street map: OpenStreetMap contributors.';
+    $('short').textContent = 'Source: ' + d.source_line;
+    $('pm').href = d.project_map_url;
+    $('map').hidden = false; $('bar').hidden = false;
+
+    var b = d.bbox, bounds = L.latLngBounds([b[1], b[0]], [b[3], b[2]]);
+    var map = L.map('map', { zoomSnap: 0.25, maxBounds: bounds.pad(1.5), minZoom: 6, maxZoom: 17 });
+    var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 17, attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics' });
+    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { maxZoom: 17, attribution: '&copy; OpenStreetMap contributors' });
+    sat.addTo(map);
+    var atlas = L.imageOverlay(d.image_url, bounds, { opacity: 0.65, alt: d.caption }).addTo(map);
+    var ring = L.circle([d.lat, d.lon], { radius: (d.accuracy_km || 5) * 1000, color: '#7a2e8e', weight: 2.5,
+      dashArray: '7 6', fillColor: '#7a2e8e', fillOpacity: 0.06 }).addTo(map);
+    ring.bindTooltip(d.name_zh + ' (atlas, approximate)', { permanent: true, direction: 'top', className: 'al', offset: [0, -4] });
+    var pins = L.layerGroup();
+    (d.pins || []).forEach(function (p) {
+      L.circleMarker([p.lat, p.lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#c62828', fillOpacity: 1 })
+        .bindTooltip(p.label || p.name, { className: 'pl', direction: 'right', offset: [6, 0] }).addTo(pins);
+    });
+    pins.addTo(map);
+    map.fitBounds(bounds);
+
+    $('fade').addEventListener('input', function () { atlas.setOpacity(this.value / 100); });
+    $('pins').addEventListener('change', function () { this.checked ? pins.addTo(map) : map.removeLayer(pins); });
+    $('streets').addEventListener('change', function () {
+      if (this.checked) { map.removeLayer(sat); osm.addTo(map); osm.bringToBack(); }
+      else { map.removeLayer(osm); sat.addTo(map); sat.bringToBack(); }
+    });
+  }).catch(function () { fail('The atlas view could not be loaded. Please try the link again in a minute.'); });
+})();
+</script>
+</body>
+</html>

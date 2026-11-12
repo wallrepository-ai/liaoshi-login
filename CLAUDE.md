@@ -3,7 +3,7 @@
 ## What this repository is
 
 The public GitHub Pages host for the project's connector sign-in pages. It holds
-eleven static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
+twelve static HTML files, a README, and nothing else. No build step, no dependencies, no secrets.
 
 Served at: https://wallrepository-ai.github.io/liaoshi-login/
 
@@ -20,6 +20,7 @@ Served at: https://wallrepository-ai.github.io/liaoshi-login/
 | `maintenance.html` | "Down for maintenance" page, no form (task ALM): the sign-in routes send the browser here in maintenance (`?state=` shows a small administrators' sign-in link) and when an alarm blocked the browser's network (`?k=busy`) |
 | `action.html` | Confirmation page of the alarm emails' action links (task ALM): reads `?t=` from `/alarm/link`, its button posts `t` to `/alarm/act`, which answers back with `?done=&result=` |
 | `status.html` | Public status page (task DTR): AID's own status from the server's `/status`, and, read by the visitor's browser, the status of Supabase, GitHub, Anthropic and OpenAI; the chatbot guide points researchers here when a tool call gets no answer; a prefilled mail to the researcher mailbox. No form |
+| `atlas.html` | Historical atlas view (task HAS, 2026-11-12): `?s=<snippet code>` shows a snippet of a historical atlas sheet laid over a satellite map (Leaflet, Esri imagery) with a fade slider, the project map pins in the area and the source line; data and a one-hour image link come from the edge function `atlas-view` in `sources`. The chatbot gives the link from `aid_map_note`. No form |
 
 ## The main project is elsewhere
 
