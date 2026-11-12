@@ -62,7 +62,7 @@
   function fail(text) { $('caption').textContent = ''; $('msg').textContent = text; $('msg').hidden = false; }
   var code = new URLSearchParams(location.search).get('s') || '';
   if (!/^[A-Za-z0-9_-]{1,80}$/.test(code)) { fail('This link names no atlas snippet. Ask your chatbot for the place again.'); return; }
-  fetch(API + '?s=' + encodeURIComponent(code)).then(function (r) { return r.json(); }).then(function (d) {
+  fetch(API + '?s=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(new URLSearchParams(location.search).get('t') || '')).then(function (r) { return r.json(); }).then(function (d) {
     if (d.error) { fail(d.error); return; }
     var t = $('title'); t.textContent = '';
     var zh = document.createElement('span'); zh.className = 'zh'; zh.textContent = d.name_zh;
