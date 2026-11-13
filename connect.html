@@ -43,8 +43,11 @@
     <p>In Claude open <strong>Customize → Connectors → Add custom connector</strong>,
     give it a name (for example <em><span data-name="short">AID</span></em>) and paste this URL:</p>
     <p><code>https://mzjfnyjparfdeiohlxoa.supabase.co/functions/v1/mcp-server</code></p>
-    <p>Other MCP-capable clients (Claude Desktop, ChatGPT, and others) take the same URL.
-    A free Claude account can hold one custom connector.</p>
+    <p>Other MCP-capable clients take the same URL. In Gemini (gemini.google.com) open
+    <strong>Connected Apps</strong> and choose <strong>Connect to an MCP server</strong>; in
+    ChatGPT turn on developer mode in the settings first. Whether a client offers custom
+    connectors depends on its plan: a free Claude account can hold one custom connector,
+    and ChatGPT and Gemini may ask for a paid plan.</p>
   </div>
 
   <div class="cat">2 · Sign in</div>
@@ -54,8 +57,9 @@
     password, and you are sent back to the chat. No account yet?
     <a href="signup.html">Create one</a>, click the verification link in your inbox (if it is not there, look in your spam or junk folder),
     then connect again.</p>
-    <p>Your sign-in renews itself for 30 days. After that Claude asks you to sign in
-    once more.</p>
+    <p>Your sign-in renews itself in the background and has no fixed end date. You are
+    asked to sign in again when you disconnect the connector, when you connect from a new
+    client, or when the project ends the session.</p>
   </div>
 
   <div class="cat">3 · The permission cards</div>
@@ -63,14 +67,18 @@
     <h2>"Claude wants to use Query from <span data-name="short">AID</span>"</h2>
     <p>Claude asks before it uses any tool of a custom connector for the first time.
     This is Claude's own safety step, not a sign-in problem, and the database cannot
-    switch it off. You will see one card per tool:</p>
+    switch it off. The connector has nine tools, eight of them read-only, and you will
+    see one card per tool:</p>
     <table>
       <tr><th>Tool</th><th>What it does</th><th>Changes anything?</th></tr>
+      <tr><td>Guide</td><td>gives the chatbot the current instructions for using the database</td><td class="ro">no, read-only</td></tr>
       <tr><td>List tables</td><td>lists the tables of the database</td><td class="ro">no, read-only</td></tr>
       <tr><td>Describe table</td><td>explains the columns of one table</td><td class="ro">no, read-only</td></tr>
       <tr><td>Query</td><td>runs one SELECT, at most 200 rows</td><td class="ro">no, read-only</td></tr>
-      <tr><td>Menu</td><td>About, how to use, sources, news, contact</td><td class="ro">no, read-only</td></tr>
-      <tr><td>Get scan</td><td>15-minute link to a scanned printed page</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Menu</td><td>the info menu: about, how to use, sources and credits, contribute, news, coverage, contact, terms</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Get scan</td><td>15-minute link to the image of a scanned page</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Satellite entry</td><td>shows one entry of a satellite source (a related work), with its attribution</td><td class="ro">no, read-only</td></tr>
+      <tr><td>Source excerpt</td><td>shows a region of a printed page as an image, with its citation</td><td class="ro">no, read-only</td></tr>
       <tr><td>Submit comment</td><td>records a comment or correction under your name</td><td class="wr">yes, writes</td></tr>
     </table>
     <p>Choose <strong>Always allow</strong> on the read-only tools and that card does not
@@ -109,8 +117,10 @@
       before; sign in with your password instead of creating an account again.</p>
       <p><strong>Forgot your password</strong>: use "Reset it" on the sign-in page; a
       link to choose a new password arrives by email and is valid for one hour.</p>
-      <p><strong>"Query budget reached"</strong>: each account has a budget of rows
-      per day, week and month; the message says when it frees up.</p>
+      <p><strong>"Volume limit"</strong> or <strong>"Pace limit"</strong>: each account
+      has a budget of rows per 24 hours, 7 days and 30 days (3,000, 10,000 and 25,000 for a
+      standard account) and a pace of 300 queries per hour; the message says when it frees
+      up.</p>
   </div>
 
   <p class="note">Inside a chat, type <code>menu</code> for the info menu, or read it on

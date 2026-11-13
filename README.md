@@ -17,16 +17,17 @@ It is not a Supabase permission. Row level security, Supabase Auth settings,
 `verify_jwt`, API keys and OAuth scopes are all evaluated after the user has
 approved the call, so nothing on the Supabase side can remove the cards. The sign-in
 requirement is a separate step: it happens once when the connector is added and is
-renewed silently for 30 days.
+renewed silently, with no fixed end date (owner rule of 2026-10-19).
 
 The server can still influence how many cards a researcher sees. The MCP server
 already sends `annotations: { readOnlyHint: true, openWorldHint: false }` on
-`list_tables`, `describe_table`, `query`, `menu` and `get_scan`, and
+the eight read-only tools (`guide`, `list_tables`, `describe_table`, `query`, `menu`,
+`get_scan`, `satellite_entry` and `source_excerpt`), and
 `{ readOnlyHint: false, destructiveHint: false }` on `submit_comment`. Claude uses
 these to sort the tools into read-only and write groups on the connector's settings
 page, where a whole group can be set to Always allow. They do not suppress the first
-card. A `title` on each tool (for example "Query (read-only)") changes the wording of
-the card from the humanized tool name to the title.
+card. A `title` on each tool (for example "Query (read-only)") would change the wording
+of the card from the humanized tool name to the title; the server sets no titles today.
 
 One card is paid per distinct tool, so a first question that runs `list_tables`,
 then `describe_table`, then `query` costs three cards before the first answer.
@@ -42,7 +43,7 @@ every user, even when the tool list is unchanged (anthropics/claude-ai-mcp issue
 redeployed for wording alone.
 
 The page `connect.html` tells researchers what the cards mean, recommends Always
-allow for the five read-only tools, and points to the connector settings page for
+allow for the eight read-only tools, and points to the connector settings page for
 setting all of them at once. The only way to have no cards at all is a client with a
 different approval model, for example a web front end of your own that calls the
 Anthropic Messages API with its MCP connector, where tool calls are not gated by a
@@ -59,4 +60,4 @@ capabilities" (support.claude.com/en/articles/11176164); the MCP specification o
 
 `status.html` is the public status page (task DTR, `docs/DTR_DESIGN.md` in `sources`): it shows whether the service is answering, from the server's `/status`, and reads the public status of Supabase, GitHub, Anthropic and OpenAI in the visitor's own browser, so it still says something useful when the server itself cannot be reached. The chatbot guide sends researchers here when a tool call gets no answer. It has no form; its mail link opens the visitor's own mail program.
 
-`atlas.html` is the historical atlas view (task HAS in `sources`): opened with `?s=<snippet code>` from a link the chatbot gives, it shows a referenced snippet of a historical atlas sheet laid over a satellite image, with a slider that fades between the two, the project map pins in the area, and the source line. It reads its data from the edge function `atlas-view`. It has no form.
+`atlas.html` is the historical atlas view (task HAS in `sources`): opened with `?s=<snippet code>&t=<signature>` from a link the chatbot gives, it shows a referenced snippet of a historical atlas sheet laid over a satellite image, with a slider that fades between the two, the project map pins in the area, and the source line. It reads its data from the edge function `atlas-view`. It has no form.

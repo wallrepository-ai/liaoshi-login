@@ -64,6 +64,7 @@
   if (!/^[A-Za-z0-9_-]{1,80}$/.test(code)) { fail('This link names no atlas snippet. Ask your chatbot for the place again.'); return; }
   fetch(API + '?s=' + encodeURIComponent(code) + '&t=' + encodeURIComponent(new URLSearchParams(location.search).get('t') || '')).then(function (r) { return r.json(); }).then(function (d) {
     if (d.error) { fail(d.error); return; }
+    var line = d.geometry && d.geometry.type === 'LineString';
     var t = $('title'); t.textContent = '';
     var zh = document.createElement('span'); zh.className = 'zh'; zh.textContent = d.name_zh;
     t.appendChild(zh); t.appendChild(document.createTextNode(' in the historical atlas' + (d.year_ce ? ' (' + d.year_ce + ' CE)' : '')));
@@ -84,7 +85,6 @@
       { maxZoom: 17, attribution: '&copy; OpenStreetMap contributors' });
     sat.addTo(map);
     var atlas = L.imageOverlay(d.image_url, bounds, { opacity: 0.65, alt: d.caption }).addTo(map);
-    var line = d.geometry && d.geometry.type === 'LineString';
     var tag = d.name_zh + ' (atlas, approximate)';
     if (line) {
       // a river: its course as traced from the atlas, drawn as a dashed line over the corridor cut

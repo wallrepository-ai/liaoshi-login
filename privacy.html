@@ -18,7 +18,7 @@
 <body>
 <main>
   <h1>Privacy note</h1>
-  <p class="draft">Draft of 2026-10-12, written for the owner's review. It describes what the
+  <p class="draft">Draft of 2026-11-13 (it revises the drafts of 2026-10-12 and 2026-10-18), written for the owner's review. It describes what the
   system does today; the owner will confirm or amend it.</p>
 
   <h2>What <span data-name="short">AID</span> keeps about you</h2>
@@ -26,31 +26,48 @@
   hash by Supabase Auth, the sign-in service the database runs on; nobody can read it
   back. The address is used to verify the account, to let you sign in from your AI
   client, and to send you a reset link if you ask for one.</p>
-  <p>When your AI client queries the database, <span data-name="short">AID</span> logs the request: the wording of
-  your question as the client sends it, the query it ran, the rows it returned, the
-  time, the client program and the address it came from, and the account that made it.
-  The owner reads this log to see what researchers ask and where the database falls
-  short, and to keep the service working. Comments you submit through the connector are
-  kept with the account that sent them.</p>
+  <p>Every time your AI client uses a tool of the connector, <span data-name="short">AID</span> logs the request: the
+  wording of your question and the purpose of the request as the client sends them, the
+  tool and what it was asked (for a query, its text), the rows it returned (up to a size
+  limit), the time and duration, any error, the account and the session that made it, and
+  technical details of the connection: the internet address it came from, the name of the
+  client program and the language and country headers it sends. <span data-name="short">AID</span> does not receive the
+  rest of your conversation or any file you gave your AI client. The owner reads this log
+  to see what researchers ask and where the database falls short, and to keep the service
+  working. No date is set at present for deleting log entries.</p>
+  <p>Sign-ins, failed sign-ins (with the address that was typed), sign-ups and password
+  resets are recorded with their time, internet address and program name. Automatic rules
+  read this record to protect the service: they can hold one account, refuse one internet
+  address for an hour, or close the service for maintenance, and they send an alert to the
+  project's monitoring mailbox.</p>
+  <p>Comments you submit through the connector are kept with the account that sent them.
+  Each comment is read by the project's automated comment handler, an AI routine that
+  checks it against the sources, and a copy is mailed to the project's mailbox.</p>
 
   <h2>Feedback from <span data-name="short">AID</span></h2>
   <p>The sign-up form has a box, ticked until you untick it, asking whether you would like
   feedback from <span data-name="short">AID</span>: replies about comments you submit and news about the database. <span data-name="short">AID</span>
-  writes to you only if the box is still ticked when you create the account, and records when you made the choice and
+  writes to you only if the box is still ticked when you create the account, or if you later ask your AI client to have replies to your comments sent to you, and records when you made the choice and
   which version of this note you saw. You can withdraw at any time through the contact
   entry of the <a href="menu.html">menu</a>; no message is sent after that.</p>
 
   <h2>What <span data-name="short">AID</span> does not do</h2>
   <p>Your address and your questions are not sold, shared or passed on to anyone, and
   are not used for advertising. The sign-in pages set one short-lived cookie during
-  sign-in and no other; there is no tracking on these pages. The services that hold the
-  data are Supabase (the database and sign-in), GitHub Pages (these pages) and the email
-  service that delivers verification and reset links.</p>
+  sign-in and no other; there is no tracking on these pages. The services that hold or
+  handle the data are Supabase (the database and sign-in), GitHub Pages (these pages), the
+  email service that delivers verification, reset and reply messages, and Anthropic, whose
+  service runs the comment handler. Two pages ask other services for content from your
+  browser, which therefore see your internet address: the atlas page loads its maps from
+  Esri and OpenStreetMap and its map program from Cloudflare's library host, and the
+  status page reads the public status pages of Supabase, GitHub, Anthropic and OpenAI.</p>
 
   <h2>Deleting your account</h2>
-  <p>Ask through the contact entry of the <a href="menu.html">menu</a>. The account, its
-  profile and its sessions are deleted; comments you submitted stay with the database
-  under no name, because they are corrections to a shared text.</p>
+  <p>Ask through the contact entry of the <a href="menu.html">menu</a>. The owner deletes
+  the account, its profile and its sessions by hand; comments you submitted stay with the
+  database, because they are corrections to a shared text. Whether the log of your earlier
+  requests is deleted with the account is not yet decided; ask, and the owner will answer
+  for your case.</p>
 
   <p style="margin-top:22px"><a href="index.html">Back to sign-in</a> ·
   <a href="signup.html">Create an account</a> · <a href="connect.html">Connection guide</a></p>
