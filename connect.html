@@ -118,12 +118,19 @@
     project's own links (its map, its atlas view, its scanned pages). Outside material
     that you asked for stands under a heading "Not from <span data-name="short">AID</span>".</p>
   </div>
-  <div class="bit">
-    <h2>ChatGPT: refresh the connector once</h2>
-    <p>ChatGPT keeps the connector's rules as they were on the day you connected. To load
-    the current ones, open <strong>Settings → Connectors</strong> (in some versions
-    <strong>Apps</strong>), choose the connector, press <strong>Refresh</strong>, and start
-    a new chat. Claude and Gemini load them by themselves.</p>
+  <div class="bit" id="refresh">
+    <h2>Refresh the connector</h2>
+    <p>Chat programs keep a copy of the connector's tools and rules. When the copy is old,
+    the chatbot tells you once, in one sentence, and links here. The answer you got is still
+    complete; a refresh adds what is new.</p>
+    <p><strong>ChatGPT</strong> keeps the copy from the day you connected until you refresh it.
+    Open <a href="https://chatgpt.com/plugins" target="_blank" rel="noopener">chatgpt.com/plugins</a>
+    (in older versions <strong>Settings → Connectors</strong> or <strong>Apps</strong>), choose
+    the connector, press <strong>Refresh</strong>, and start a new chat.</p>
+    <p><strong>Claude</strong> loads the current copy in a new chat. If the note comes again,
+    open <a href="https://claude.ai/customize/connectors" target="_blank" rel="noopener">claude.ai/customize/connectors</a>,
+    disconnect the connector, connect it again, and start a new chat.</p>
+    <p><strong>Gemini</strong> loads the current copy by itself; start a new chat.</p>
   </div>
 
   <div class="cat">Trouble?</div>
