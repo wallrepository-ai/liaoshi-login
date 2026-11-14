@@ -13,7 +13,7 @@ Served at: https://wallrepository-ai.github.io/liaoshi-login/
 | `signup.html` | Account creation |
 | `verified.html` | Post-verification landing page |
 | `menu.html` | Public "data bits" info menu |
-| `connect.html` | Connection guide: sign-in steps and the per-tool permission cards Claude shows |
+| `connect.html` | Connection guide: sign-in steps, the per-tool permission cards Claude shows, and (task MCI, 2026-11-14) the line a researcher pastes into the chat program's custom instructions to keep web results and pictures out, with the Refresh step for ChatGPT |
 | `reset.html` | Password reset, step 1: the address; posts to `/recover` |
 | `newpassword.html` | Password reset, step 2: the new password; the reset email's link lands here with a token in the URL fragment; posts to `/password` |
 | `privacy.html` | Privacy note linked from sign-up, sign-in and the menu (draft of 2026-10-12, owner to confirm) |
