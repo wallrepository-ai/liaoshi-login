@@ -29,6 +29,15 @@
   #msg { padding: 24px 16px; font-size: 16px; }
   .leaflet-tooltip.pl { background: #fff; border: 1px solid #c62828; color: #8e1616; font-size: 12px; padding: 1px 5px; }
   .leaflet-tooltip.al { background: #fff; border: 1px solid #7a2e8e; color: #3d1249; font-size: 13px; font-weight: 600; padding: 1px 6px; }
+  #legbtn { font: inherit; font-size: 14px; font-weight: 600; padding: 5px 12px; border: 1px solid #7a2e8e; border-radius: 6px; background: #fff; color: #5b1f6b; cursor: pointer; white-space: nowrap; }
+  #legbtn:hover, #legbtn[aria-expanded="true"] { background: #7a2e8e; color: #fff; }
+  #legend { position: fixed; z-index: 2000; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); background: #fff; box-shadow: -4px 0 18px rgba(0,0,0,.25); display: flex; flex-direction: column; }
+  #legend[hidden] { display: none; }
+  #legend .lh { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 14px; }
+  #legend .lh button { font-size: 20px; line-height: 1; border: 0; background: none; cursor: pointer; padding: 2px 6px; }
+  #legend .lb { overflow: auto; flex: 1; padding: 8px; }
+  #legend img { width: 100%; height: auto; display: block; }
+  #legend .ln { font-size: 12.5px; color: #555; padding: 6px 12px 10px; border-top: 1px solid #eee; }
 </style>
 </head>
 <body>
@@ -43,6 +52,7 @@
     <span>Satellite</span>
     <input id="fade" type="range" min="0" max="100" value="65" aria-label="Fade between the satellite map and the atlas">
     <span>Atlas</span>
+    <button type="button" id="legbtn" aria-controls="legend" aria-expanded="false" hidden>Map legend</button>
   </div>
   <div class="row">
     <span><i class="key ring"></i><span class="approx">Approximate position</span> <span id="approxtext">read off the atlas, not a located site</span></span>
@@ -54,6 +64,11 @@
   <details id="det"><summary>Accuracy and map credits</summary><p class="src" id="src"></p></details>
   <p class="src" id="short"></p>
 </div>
+<aside id="legend" hidden aria-label="Legend of the atlas">
+  <div class="lh"><strong>Legend of the atlas</strong><span><a id="legfull" href="#" target="_blank" rel="noopener">full size</a> <button type="button" id="legclose" aria-label="Close the legend">&times;</button></span></div>
+  <div class="lb"><img id="legimg" alt="Legend of the atlas: historical and contemporary symbols for places, communications, boundaries, water and relief"></div>
+  <p class="ln">Left column: the historical symbols (black names) used on every sheet of the atlas. Right column: the modern features printed under them (brown names).</p>
+</aside>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
@@ -107,6 +122,19 @@
     pins.addTo(map);
     map.fitBounds(bounds);
 
+    if (d.legend_url) {
+      // the atlas's own legend (HAS 8): opens beside the map, the map stays usable; Esc or the cross closes it
+      var lb = $('legbtn'), lg = $('legend');
+      lb.hidden = false; $('legfull').href = d.legend_url;
+      var show = function (on) {
+        if (on && !$('legimg').src) $('legimg').src = d.legend_url;
+        lg.hidden = !on; lb.setAttribute('aria-expanded', on ? 'true' : 'false');
+      };
+      lb.addEventListener('click', function () { show(lg.hidden); });
+      $('legclose').addEventListener('click', function () { show(false); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') show(false); });
+      if (new URLSearchParams(location.search).get('legend') === '1') show(true);
+    }
     $('fade').addEventListener('input', function () { atlas.setOpacity(this.value / 100); });
     $('pins').addEventListener('change', function () { this.checked ? pins.addTo(map) : map.removeLayer(pins); });
     $('streets').addEventListener('change', function () {
