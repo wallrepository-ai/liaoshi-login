@@ -37,6 +37,14 @@
   #legend .lh button { font-size: 20px; line-height: 1; border: 0; background: none; cursor: pointer; padding: 2px 6px; }
   #legend .lb { overflow: auto; flex: 1; padding: 8px; }
   #legend img { width: 100%; height: auto; display: block; }
+  .snip { background: none; border: 0; }
+  .snip img { display: block; width: 100%; height: 100%; box-shadow: 0 1px 6px rgba(0,0,0,.45); outline: 1px solid rgba(122,46,142,.55); }
+  .snip i { position: absolute; width: 14px; height: 14px; margin: -8px 0 0 -8px; border: 2px solid #7a2e8e; border-radius: 50%; box-shadow: 0 0 0 1px #fff; }
+  .seg { display: inline-flex; border: 1px solid #7a2e8e; border-radius: 6px; overflow: hidden; vertical-align: middle; }
+  .seg button { font: inherit; font-size: 13px; padding: 3px 9px; border: 0; background: #fff; color: #5b1f6b; cursor: pointer; }
+  .seg button + button { border-left: 1px solid #7a2e8e; }
+  .seg button[aria-pressed="true"] { background: #7a2e8e; color: #fff; }
+  .seg button:disabled { color: #aaa; cursor: default; }
   #legend .ln { font-size: 12.5px; color: #555; padding: 6px 12px 10px; border-top: 1px solid #eee; }
 </style>
 </head>
@@ -53,6 +61,10 @@
     <input id="fade" type="range" min="0" max="100" value="65" aria-label="Fade between the satellite map and the atlas">
     <span>Atlas</span>
     <button type="button" id="legbtn" aria-controls="legend" aria-expanded="false" hidden>Map legend</button>
+  </div>
+  <div class="row" id="sniprow">
+    <span>Atlas snippet: <span class="seg" role="group" aria-label="How the atlas snippet is drawn"><button type="button" id="mfix" aria-pressed="true" title="The snippet keeps the same readable size at every zoom, pinned at its place">Readable size</button><button type="button" id="mmap" aria-pressed="false" title="The snippet is stretched over the area it covers and grows and shrinks with the map, to check the alignment">Scale with map</button></span></span>
+    <span>Size: <span class="seg" role="group" aria-label="Size of the atlas snippet"><button type="button" data-k="1" aria-pressed="true">1x</button><button type="button" data-k="1.5" aria-pressed="false">1.5x</button><button type="button" data-k="2" aria-pressed="false">2x</button></span></span>
   </div>
   <div class="row">
     <span><i class="key ring"></i><span class="approx">Approximate position</span> <span id="approxtext">read off the atlas, not a located site</span></span>
@@ -99,7 +111,45 @@
     var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       { maxZoom: 17, attribution: '&copy; OpenStreetMap contributors' });
     sat.addTo(map);
-    var atlas = L.imageOverlay(d.image_url, bounds, { opacity: 0.65, alt: d.caption }).addTo(map);
+    // SSA (2026-11-26): two ways to draw the snippet. "Readable size" (the default) keeps it at one size on screen at every
+    // zoom, pinned so that the place's point of the snippet stays on the place; "Scale with map" is the old overlay, stretched
+    // over the area the snippet covers, to check the alignment. The readable size is the size the snippet has when the page
+    // opens (fitted to the window, never above the image's own pixels), times the size button (1x, 1.5x, 2x).
+    map.createPane('snip').style.zIndex = 350;
+    var q = new URLSearchParams(location.search), op = 0.65;
+    var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+    var mode = q.get('mode') || store('atlasSnipMode') || 'fixed';
+    var k = Number(q.get('size') || store('atlasSnipSize') || 1);
+    if (mode !== 'map') mode = 'fixed';
+    if ([1, 1.5, 2].indexOf(k) < 0) k = 1;
+    var atlas = L.imageOverlay(d.image_url, bounds, { opacity: op, alt: d.caption, pane: 'snip' });
+    var fixed = null, baseW = 0;
+    var pW = map.project(bounds.getNorthWest(), 0), pE = map.project(bounds.getSouthEast(), 0), pA = map.project([d.lat, d.lon], 0);
+    var fx = (pA.x - pW.x) / (pE.x - pW.x), fy = (pA.y - pW.y) / (pE.y - pW.y);
+    var nat = { w: d.image_width || 0, h: d.image_height || 0 };
+    var drawFixed = function () {
+      if (fixed) map.removeLayer(fixed);
+      var w = Math.round(baseW * k), h = Math.round(w * nat.h / nat.w);
+      fixed = L.marker([d.lat, d.lon], { pane: 'snip', interactive: false, keyboard: false, opacity: op,
+        icon: L.divIcon({ className: 'snip', iconSize: [w, h], iconAnchor: [Math.round(fx * w), Math.round(fy * h)],
+          html: '<img alt="" src="' + d.image_url.replace(/"/g, '&quot;') + '"><i style="left:' + (fx * 100) + '%;top:' + (fy * 100) + '%"></i>' }) });
+      fixed.addTo(map);
+      var im = fixed.getElement().querySelector('img'); im.alt = d.caption;
+    };
+    var apply = function () {
+      $('mfix').setAttribute('aria-pressed', mode === 'fixed'); $('mmap').setAttribute('aria-pressed', mode === 'map');
+      document.querySelectorAll('[data-k]').forEach(function (b) {
+        b.setAttribute('aria-pressed', Number(b.getAttribute('data-k')) === k); b.disabled = mode === 'map';
+      });
+      if (mode === 'map') { if (fixed) { map.removeLayer(fixed); fixed = null; } atlas.addTo(map); }
+      else { map.removeLayer(atlas); if (baseW) drawFixed(); }
+    };
+    var start = function () {
+      // the readable size: the width the stretched snippet has in the opening view, never above the image's own width
+      var a = map.latLngToContainerPoint(bounds.getNorthWest()), b2 = map.latLngToContainerPoint(bounds.getSouthEast());
+      baseW = Math.min(nat.w, Math.max(120, Math.round(b2.x - a.x)));
+      apply();
+    };
     var tag = d.name_zh + ' (atlas, approximate)';
     if (line) {
       // a river: its course as traced from the atlas, drawn as a dashed line over the corridor cut
@@ -121,6 +171,13 @@
     });
     pins.addTo(map);
     map.fitBounds(bounds);
+    if (nat.w && nat.h) start();
+    else { var pre = new Image(); pre.onload = function () { nat = { w: pre.naturalWidth, h: pre.naturalHeight }; start(); }; pre.src = d.image_url; }
+    $('mfix').addEventListener('click', function () { mode = 'fixed'; store('atlasSnipMode', mode); apply(); });
+    $('mmap').addEventListener('click', function () { mode = 'map'; store('atlasSnipMode', mode); apply(); });
+    document.querySelectorAll('[data-k]').forEach(function (b) {
+      b.addEventListener('click', function () { k = Number(b.getAttribute('data-k')); store('atlasSnipSize', String(k)); apply(); });
+    });
 
     if (d.legend_url) {
       // the atlas's own legend (HAS 8): opens beside the map, the map stays usable; Esc or the cross closes it
@@ -135,7 +192,7 @@
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') show(false); });
       if (new URLSearchParams(location.search).get('legend') === '1') show(true);
     }
-    $('fade').addEventListener('input', function () { atlas.setOpacity(this.value / 100); });
+    $('fade').addEventListener('input', function () { op = this.value / 100; atlas.setOpacity(op); if (fixed) fixed.setOpacity(op); });
     $('pins').addEventListener('change', function () { this.checked ? pins.addTo(map) : map.removeLayer(pins); });
     $('streets').addEventListener('change', function () {
       if (this.checked) { map.removeLayer(sat); osm.addTo(map); osm.bringToBack(); }
