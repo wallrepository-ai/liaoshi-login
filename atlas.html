@@ -105,7 +105,7 @@
     $('map').hidden = false; $('bar').hidden = false;
 
     var b = d.bbox, bounds = L.latLngBounds([b[1], b[0]], [b[3], b[2]]);
-    var map = L.map('map', { zoomSnap: 0.25, maxBounds: bounds.pad(1.5), minZoom: 4, maxZoom: 17 });
+    var map = L.map('map', { zoomSnap: 0.25, maxBounds: bounds.pad(4), minZoom: 3, maxZoom: 17 });
     var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       { maxZoom: 17, attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics' });
     var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -113,8 +113,10 @@
     sat.addTo(map);
     // SSA (2026-11-26): two ways to draw the snippet. "Readable size" (the default) keeps it at one size on screen at every
     // zoom, pinned so that the place's point of the snippet stays on the place; "Scale with map" is the old overlay, stretched
-    // over the area the snippet covers, to check the alignment. The readable size is the size the snippet has when the page
-    // opens (fitted to the window, never above the image's own pixels), times the size button (1x, 1.5x, 2x).
+    // over the area the snippet covers, to check the alignment. The readable size is the size "Scale with map" gives the
+    // snippet in the opening view, times the size button (1x, 1.5x, 2x). SSA (2): the opening view is no longer fitted to the
+    // snippet (it filled a desktop monitor from top to bottom); the map opens further out, so that the snippet takes about
+    // 45% of the map's height (never under 280 pixels wide unless the window is narrower), with the country around it.
     map.createPane('snip').style.zIndex = 350;
     var q = new URLSearchParams(location.search), op = 0.65;
     var store = function (k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
@@ -145,9 +147,9 @@
       else { map.removeLayer(atlas); if (baseW) drawFixed(); }
     };
     var start = function () {
-      // the readable size: the width the stretched snippet has in the opening view, never above the image's own width
+      // the readable size: exactly the width the stretched snippet has in the opening view
       var a = map.latLngToContainerPoint(bounds.getNorthWest()), b2 = map.latLngToContainerPoint(bounds.getSouthEast());
-      baseW = Math.min(nat.w, Math.max(120, Math.round(b2.x - a.x)));
+      baseW = Math.max(60, Math.round(b2.x - a.x));
       apply();
     };
     var tag = d.name_zh + ' (atlas, approximate)';
@@ -171,6 +173,13 @@
     });
     pins.addTo(map);
     map.fitBounds(bounds);
+    (function () {
+      var a = map.latLngToContainerPoint(bounds.getNorthWest()), b2 = map.latLngToContainerPoint(bounds.getSouthEast());
+      var fw = b2.x - a.x, fh = b2.y - a.y;
+      if (!(fw > 0 && fh > 0)) return;
+      var s = Math.max(Math.min(1, 0.45 * map.getSize().y / fh), Math.min(1, 280 / fw));
+      if (s < 1) map.setView(bounds.getCenter(), map.getZoom() + Math.log(s) / Math.LN2, { animate: false });
+    })();
     if (nat.w && nat.h) start();
     else { var pre = new Image(); pre.onload = function () { nat = { w: pre.naturalWidth, h: pre.naturalHeight }; start(); }; pre.src = d.image_url; }
     $('mfix').addEventListener('click', function () { mode = 'fixed'; store('atlasSnipMode', mode); apply(); });
