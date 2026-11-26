@@ -45,7 +45,7 @@
   .seg button + button { border-left: 1px solid #7a2e8e; }
   .seg button[aria-pressed="true"] { background: #7a2e8e; color: #fff; }
   .seg button:disabled { color: #aaa; cursor: default; }
-  /* HAS (13) test, 2026-11-26: a people or a region is an area, never a point. Tried only with &shape=oval|cloud|soft|tri in the link. */
+  /* HAS (13), 2026-11-26: a people, tribe or region is an area, never a point. The owner chose the oval with a soft white halo and no line; it is used when the snippet's location_type is tribe, people or region. &shape=oval|cloud|soft|tri in the link is a test switch. */
   .area img, img.area { box-shadow: none !important; outline: 0 !important; }
   .sh-oval img, img.sh-oval { -webkit-mask-image: radial-gradient(ellipse closest-side, #000 84%, transparent 100%); mask-image: radial-gradient(ellipse closest-side, #000 84%, transparent 100%); }
   .sh-soft img, img.sh-soft { -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); mask-composite: intersect; }
@@ -139,8 +139,10 @@
     var k = Number(q.get('size') || store('atlasSnipSize') || 1);
     if (mode !== 'map') mode = 'fixed';
     if ([1, 1.5, 2].indexOf(k) < 0) k = 1;
-    // HAS (13) test: &shape=oval|cloud|soft|tri draws the snippet as an area (a people or a region), with no ring and no point
+    // HAS (13): &shape=oval|cloud|soft|tri (a test switch) draws the snippet as an area (a people or a region), with no ring and no point
+    // The owner's choice (2026-11-26): a snippet of a people, tribe or region is an oval with a soft white halo and no line.
     var shape = q.get('shape'); if (['oval', 'cloud', 'soft', 'tri'].indexOf(shape) < 0) shape = null;
+    if (!shape && ['tribe', 'people', 'region'].indexOf(d.location_type) >= 0) shape = 'oval';
     var kindWord = d.type_label || d.location_type || 'area';
     var cls = shape ? ' area sh-' + shape : '', cloudMask = '';
     if (shape === 'cloud') {
@@ -153,13 +155,15 @@
     var areaTip = null, areaLabel = function (latlng, dy) {
       if (!shape) return;
       if (areaTip) map.removeLayer(areaTip);
-      areaTip = L.circleMarker(latlng, { radius: 0.1, opacity: 0, fillOpacity: 0, interactive: false }).addTo(map)
-        .bindTooltip('<span class="zh"></span><span class="py"></span><em></em>', { permanent: true, direction: 'top', className: 'ar', offset: [0, dy] });
-      // the owner's label, 2026-11-26: the Chinese name as printed on the map, its pinyin, and the type (people, tribe, region, commandery ...)
-      var te = areaTip.getTooltip().getElement();
+      var te = document.createElement('span'); te.innerHTML = '<span class="zh"></span><span class="py"></span><em></em>';
       te.querySelector('.zh').textContent = d.name_printed || d.name_zh;
       te.querySelector('.py').textContent = d.name_pinyin ? ' · ' + d.name_pinyin : '';
       te.querySelector('em').textContent = ' · ' + kindWord;
+      // the text is set before the tag is bound, so that the tag is centered above the oval
+      areaTip = L.circleMarker(latlng, { radius: 0.1, opacity: 0, fillOpacity: 0, interactive: false }).addTo(map)
+        .bindTooltip(te, { permanent: true, direction: 'top', className: 'ar', offset: [0, dy] });
+      // the owner's label, 2026-11-26: the Chinese name as printed on the map, its pinyin, and the type (people, tribe, region, commandery ...)
+
     };
     var fixed = null, baseW = 0;
     var pW = map.project(bounds.getNorthWest(), 0), pE = map.project(bounds.getSouthEast(), 0), pA = map.project([d.lat, d.lon], 0);
