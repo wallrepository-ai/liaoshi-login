@@ -57,7 +57,7 @@
   .sh-tri { filter: drop-shadow(0 0 1.5px #0b6e6e) drop-shadow(0 0 1.5px #0b6e6e); }
   .leaflet-tooltip.ar { background: #f3fbf9; border: 1.5px dashed #0b6e6e; border-radius: 14px; color: #0b4f4f; font-size: 13px; padding: 2px 10px; box-shadow: none; white-space: nowrap; }
   .leaflet-tooltip.ar:before { display: none; }
-  .leaflet-tooltip.ar .zh { font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif; font-weight: 700; letter-spacing: .35em; margin-right: -.1em; }
+  .leaflet-tooltip.ar .zh { font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif; font-weight: 700; letter-spacing: .2em; margin-right: -.2em; }
   .leaflet-tooltip.ar em { font-style: italic; }
   .areak { width: 20px; height: 11px; border: 2px dashed #0b6e6e; border-radius: 50%; }
   #legend .ln { font-size: 12.5px; color: #555; padding: 6px 12px 10px; border-top: 1px solid #eee; }
@@ -141,7 +141,7 @@
     if ([1, 1.5, 2].indexOf(k) < 0) k = 1;
     // HAS (13) test: &shape=oval|cloud|soft|tri draws the snippet as an area (a people or a region), with no ring and no point
     var shape = q.get('shape'); if (['oval', 'cloud', 'soft', 'tri'].indexOf(shape) < 0) shape = null;
-    var kindWord = d.location_type === 'region' ? 'a region' : 'a people';
+    var kindWord = d.type_label || d.location_type || 'area';
     var cls = shape ? ' area sh-' + shape : '', cloudMask = '';
     if (shape === 'cloud') {
       var c = '<ellipse cx="50" cy="50" rx="38" ry="36"/>';
@@ -154,8 +154,12 @@
       if (!shape) return;
       if (areaTip) map.removeLayer(areaTip);
       areaTip = L.circleMarker(latlng, { radius: 0.1, opacity: 0, fillOpacity: 0, interactive: false }).addTo(map)
-        .bindTooltip('<span class="zh"></span> <em>' + kindWord + ': an area, no fixed point</em>', { permanent: true, direction: 'top', className: 'ar', offset: [0, dy] });
-      areaTip.getTooltip().getElement().querySelector('.zh').textContent = d.name_zh;
+        .bindTooltip('<span class="zh"></span><span class="py"></span><em></em>', { permanent: true, direction: 'top', className: 'ar', offset: [0, dy] });
+      // the owner's label, 2026-11-26: the Chinese name as printed on the map, its pinyin, and the type (people, tribe, region, commandery ...)
+      var te = areaTip.getTooltip().getElement();
+      te.querySelector('.zh').textContent = d.name_printed || d.name_zh;
+      te.querySelector('.py').textContent = d.name_pinyin ? ' · ' + d.name_pinyin : '';
+      te.querySelector('em').textContent = ' · ' + kindWord;
     };
     var fixed = null, baseW = 0;
     var pW = map.project(bounds.getNorthWest(), 0), pE = map.project(bounds.getSouthEast(), 0), pA = map.project([d.lat, d.lon], 0);
@@ -196,7 +200,7 @@
       document.getElementById('approxtext').textContent = 'course traced from the atlas, not a surveyed line';
     } else if (shape) {
       document.getElementById('approxkey').className = 'key areak';
-      document.getElementById('approxhead').textContent = 'Area of ' + kindWord;
+      document.getElementById('approxhead').textContent = 'Area of a ' + kindWord;
       document.getElementById('approxtext').textContent = 'the atlas prints the name across this country; no town, no fixed point';
     } else {
       L.circle([d.lat, d.lon], { radius: (d.accuracy_km || 5) * 1000, color: '#7a2e8e', weight: 2.5,
