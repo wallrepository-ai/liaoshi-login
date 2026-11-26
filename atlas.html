@@ -45,6 +45,20 @@
   .seg button + button { border-left: 1px solid #7a2e8e; }
   .seg button[aria-pressed="true"] { background: #7a2e8e; color: #fff; }
   .seg button:disabled { color: #aaa; cursor: default; }
+  /* HAS (13) test, 2026-11-26: a people or a region is an area, never a point. Tried only with &shape=oval|cloud|soft|tri in the link. */
+  .area img, img.area { box-shadow: none !important; outline: 0 !important; }
+  .sh-oval img, img.sh-oval { -webkit-mask-image: radial-gradient(ellipse closest-side, #000 84%, transparent 100%); mask-image: radial-gradient(ellipse closest-side, #000 84%, transparent 100%); }
+  .sh-soft img, img.sh-soft { -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); mask-composite: intersect; }
+  .sh-cloud img, img.sh-cloud { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
+  .sh-cloud { filter: drop-shadow(0 0 5px rgba(255,255,255,.9)); }
+  .sh-tri img, img.sh-tri { -webkit-clip-path: polygon(50% 1%, 99% 99%, 1% 99%); clip-path: polygon(50% 1%, 99% 99%, 1% 99%); }
+  .sh-tri { filter: drop-shadow(0 0 1.5px #0b6e6e) drop-shadow(0 0 1.5px #0b6e6e); }
+  .snip b { position: absolute; left: 6%; top: 6%; right: 6%; bottom: 6%; border: 2px dashed #0b6e6e; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,.7); }
+  .leaflet-tooltip.ar { background: #f3fbf9; border: 1.5px dashed #0b6e6e; border-radius: 14px; color: #0b4f4f; font-size: 13px; padding: 2px 10px; box-shadow: none; white-space: nowrap; }
+  .leaflet-tooltip.ar:before { display: none; }
+  .leaflet-tooltip.ar .zh { font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif; font-weight: 700; letter-spacing: .35em; margin-right: -.1em; }
+  .leaflet-tooltip.ar em { font-style: italic; }
+  .areak { width: 20px; height: 11px; border: 2px dashed #0b6e6e; border-radius: 50%; }
   #legend .ln { font-size: 12.5px; color: #555; padding: 6px 12px 10px; border-top: 1px solid #eee; }
 </style>
 </head>
@@ -67,7 +81,7 @@
     <span>Size: <span class="seg" role="group" aria-label="Size of the atlas snippet"><button type="button" data-k="1" aria-pressed="true">1x</button><button type="button" data-k="1.5" aria-pressed="false">1.5x</button><button type="button" data-k="2" aria-pressed="false">2x</button></span></span>
   </div>
   <div class="row">
-    <span><i class="key ring"></i><span class="approx">Approximate position</span> <span id="approxtext">read off the atlas, not a located site</span></span>
+    <span><i class="key ring" id="approxkey"></i><span class="approx" id="approxhead">Approximate position</span> <span id="approxtext">read off the atlas, not a located site</span></span>
     <span><i class="key pin"></i>Pin of the <span data-name="short">AID</span> map: a site seen on the satellite image</span>
     <label><input type="checkbox" id="pins" checked> show pins</label>
     <label><input type="checkbox" id="streets"> street map instead of satellite</label>
@@ -96,7 +110,7 @@
     var zh = document.createElement('span'); zh.className = 'zh'; zh.textContent = d.name_zh;
     t.appendChild(zh); t.appendChild(document.createTextNode(' in the historical atlas' + (d.year_ce ? ' (' + d.year_ce + ' CE)' : '')));
     $('caption').textContent = d.caption + ' Move the slider to fade between the printed atlas and the satellite image.';
-    $('src').textContent = (d.accuracy_note ? d.accuracy_note + ' ' : '') + (line ? 'Middle of the course: about ' : 'Position: about ') +
+    $('src').textContent = (d.accuracy_note ? d.accuracy_note + ' ' : '') + (line ? 'Middle of the course: about ' : shape ? 'Middle of the area: about ' : 'Position: about ') +
       Number(d.lat).toFixed(2) + '° N, ' + Number(d.lon).toFixed(2) + '° E, within roughly ' + d.accuracy_km +
       ' km. ' + (d.sheet && d.sheet.georef_check ? 'Placement check: ' + d.sheet.georef_check + ' ' : '') +
       'Satellite imagery: Esri, Maxar, Earthstar Geographics. Street map: OpenStreetMap contributors.';
@@ -124,7 +138,24 @@
     var k = Number(q.get('size') || store('atlasSnipSize') || 1);
     if (mode !== 'map') mode = 'fixed';
     if ([1, 1.5, 2].indexOf(k) < 0) k = 1;
-    var atlas = L.imageOverlay(d.image_url, bounds, { opacity: op, alt: d.caption, pane: 'snip' });
+    // HAS (13) test: &shape=oval|cloud|soft|tri draws the snippet as an area (a people or a region), with no ring and no point
+    var shape = q.get('shape'); if (['oval', 'cloud', 'soft', 'tri'].indexOf(shape) < 0) shape = null;
+    var kindWord = d.location_type === 'region' ? 'a region' : 'a people';
+    var cls = shape ? ' area sh-' + shape : '', cloudMask = '';
+    if (shape === 'cloud') {
+      var c = '<ellipse cx="50" cy="50" rx="38" ry="36"/>';
+      for (var i = 0; i < 11; i++) { var an = i * 2 * Math.PI / 11 + 0.3; c += '<ellipse cx="' + (50 + 35 * Math.cos(an)).toFixed(1) + '" cy="' + (50 + 34 * Math.sin(an)).toFixed(1) + '" rx="' + (i % 2 ? 13 : 10.5) + '" ry="' + (i % 2 ? 14 : 11.5) + '"/>'; }
+      cloudMask = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><filter id="f"><feGaussianBlur stdDeviation="0.9"/></filter><g filter="url(#f)">' + c + '</g></svg>') + '")';
+    }
+    var shapeImg = function (im) { if (cloudMask) { im.style.webkitMaskImage = cloudMask; im.style.maskImage = cloudMask; } };
+    var atlas = L.imageOverlay(d.image_url, bounds, { opacity: op, alt: d.caption, pane: 'snip', className: cls.trim() });
+    var areaTip = null, areaLabel = function (latlng, dy) {
+      if (!shape) return;
+      if (areaTip) map.removeLayer(areaTip);
+      areaTip = L.circleMarker(latlng, { radius: 0.1, opacity: 0, fillOpacity: 0, interactive: false }).addTo(map)
+        .bindTooltip('<span class="zh"></span> <em>' + kindWord + ': an area, no fixed point</em>', { permanent: true, direction: 'top', className: 'ar', offset: [0, dy] });
+      areaTip.getTooltip().getElement().querySelector('.zh').textContent = d.name_zh;
+    };
     var fixed = null, baseW = 0;
     var pW = map.project(bounds.getNorthWest(), 0), pE = map.project(bounds.getSouthEast(), 0), pA = map.project([d.lat, d.lon], 0);
     var fx = (pA.x - pW.x) / (pE.x - pW.x), fy = (pA.y - pW.y) / (pE.y - pW.y);
@@ -133,17 +164,20 @@
       if (fixed) map.removeLayer(fixed);
       var w = Math.round(baseW * k), h = Math.round(w * nat.h / nat.w);
       fixed = L.marker([d.lat, d.lon], { pane: 'snip', interactive: false, keyboard: false, opacity: op,
-        icon: L.divIcon({ className: 'snip', iconSize: [w, h], iconAnchor: [Math.round(fx * w), Math.round(fy * h)],
-          html: '<img alt="" src="' + d.image_url.replace(/"/g, '&quot;') + '"><i style="left:' + (fx * 100) + '%;top:' + (fy * 100) + '%"></i>' }) });
+        icon: L.divIcon({ className: 'snip' + cls, iconSize: [w, h], iconAnchor: [Math.round(fx * w), Math.round(fy * h)],
+          html: '<img alt="" src="' + d.image_url.replace(/"/g, '&quot;') + '">' + (shape ? (shape === 'oval' ? '<b></b>' : '') : '<i style="left:' + (fx * 100) + '%;top:' + (fy * 100) + '%"></i>') }) });
       fixed.addTo(map);
-      var im = fixed.getElement().querySelector('img'); im.alt = d.caption;
+      var im = fixed.getElement().querySelector('img'); im.alt = d.caption; shapeImg(im);
+      // the label sits just above the shape; on a small screen, where the shape reaches the top of the map, just inside the map's top
+      var top = map.latLngToContainerPoint([d.lat, d.lon]).y - Math.round(fy * h) + (shape === 'tri' ? 0 : 6);
+      areaLabel([d.lat, d.lon], -Math.round(fy * h) + (shape === 'tri' ? 0 : 6) + Math.max(0, 30 - top));
     };
     var apply = function () {
       $('mfix').setAttribute('aria-pressed', mode === 'fixed'); $('mmap').setAttribute('aria-pressed', mode === 'map');
       document.querySelectorAll('[data-k]').forEach(function (b) {
         b.setAttribute('aria-pressed', Number(b.getAttribute('data-k')) === k); b.disabled = mode === 'map';
       });
-      if (mode === 'map') { if (fixed) { map.removeLayer(fixed); fixed = null; } atlas.addTo(map); }
+      if (mode === 'map') { if (fixed) { map.removeLayer(fixed); fixed = null; } atlas.addTo(map); shapeImg(atlas.getElement()); areaLabel([bounds.getNorth(), d.lon], 4); }
       else { map.removeLayer(atlas); if (baseW) drawFixed(); }
     };
     var start = function () {
@@ -159,6 +193,10 @@
       L.polyline(pts, { color: '#7a2e8e', weight: 2.5, dashArray: '7 6', opacity: 0.9 }).addTo(map)
         .bindTooltip(tag, { permanent: true, direction: 'top', className: 'al', offset: [0, -6] });
       document.getElementById('approxtext').textContent = 'course traced from the atlas, not a surveyed line';
+    } else if (shape) {
+      document.getElementById('approxkey').className = 'key areak';
+      document.getElementById('approxhead').textContent = 'Area of ' + kindWord;
+      document.getElementById('approxtext').textContent = 'the atlas prints the name across this country; no town, no fixed point';
     } else {
       L.circle([d.lat, d.lon], { radius: (d.accuracy_km || 5) * 1000, color: '#7a2e8e', weight: 2.5,
         dashArray: '7 6', fillColor: '#7a2e8e', fillOpacity: 0.06 }).addTo(map);
